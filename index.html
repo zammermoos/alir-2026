@@ -261,6 +261,7 @@
 
   <div class="clockbar">
     <div><span class="lbl">Ship's clock</span><span class="val num" id="nowClock">--:--:--</span></div>
+    <div><span class="lbl">To our start</span><span class="val num" id="nowToStart">--:--</span></div>
     <div><span class="lbl">Our elapsed</span><span class="val num" id="nowElapsed">pre-start</span></div>
     <div><span class="lbl">Course</span><span class="val num" id="nowDist">207 nm</span></div>
     <div class="tz">Clock and elapsed use this device's timezone — keep the device on race-local (Eastern) time.</div>
@@ -772,6 +773,7 @@
     startDT.setSeconds(startSecs(self.div));
     var el = (now - startDT) / 1000;
     document.getElementById("nowElapsed").textContent = el < 0 ? "pre-start" : fmt(el);
+    document.getElementById("nowToStart").textContent = el < 0 ? fmt(-el) : "started";
     var cds = document.querySelectorAll(".cd[data-deadline]");
     if (cds.length) {
       var nowSecs = (now - raceDay(0)) / 1000;
