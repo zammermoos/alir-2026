@@ -133,6 +133,39 @@
     border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); cursor: pointer;
   }
 
+  .brf h3 {
+    font-family: "Avenir Next Condensed", "Arial Narrow", sans-serif-condensed, sans-serif;
+    font-size: 14px; text-transform: uppercase; letter-spacing: .08em;
+    margin: 18px 0 6px; border-bottom: 1px solid var(--line); padding-bottom: 3px;
+  }
+  .brf p, .brf li { font-size: 14px; }
+  .brf ul.plain { margin: 4px 0; padding-left: 18px; }
+  .brf .src { font-size: 12px; color: var(--ink-soft); }
+  .keycard {
+    background: var(--self-bg); border: 1px solid var(--line); border-radius: 8px;
+    padding: 12px 14px; margin-top: 12px;
+  }
+  .keycard .kc-title { font-weight: 700; margin-bottom: 6px; }
+  table.seq { border-collapse: collapse; margin: 6px 0 2px; }
+  table.seq td { padding: 3px 12px 3px 0; font-size: 14px; vertical-align: baseline; }
+  table.seq td.t { font-weight: 700; white-space: nowrap; }
+  .comms { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; margin-top: 6px; }
+  .comms .cc {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px;
+  }
+  .comms .cc .cl { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); display: block; }
+  .comms .cc .cv { font-size: 14.5px; font-weight: 600; }
+  .comms .cc a { color: var(--accent); text-decoration: none; }
+  ul.chk { list-style: none; padding: 0; margin: 4px 0; }
+  ul.chk li { border-bottom: 1px solid var(--line); }
+  ul.chk li:last-child { border-bottom: none; }
+  ul.chk label {
+    display: flex; gap: 10px; align-items: flex-start; padding: 10px 4px;
+    min-height: 44px; cursor: pointer; font-size: 14px;
+  }
+  ul.chk input[type="checkbox"] { width: 22px; height: 22px; flex: none; accent-color: var(--accent); margin: 0; }
+  ul.chk input[type="checkbox"]:checked + span { color: var(--ink-soft); text-decoration: line-through; }
+
   .legend { display: flex; gap: 14px; flex-wrap: wrap; margin: 0 2px 12px; font-size: 13px; color: var(--ink-soft); }
   .legend .chip { display: inline-flex; align-items: center; gap: 6px; }
   .legend .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; flex: none; }
@@ -227,6 +260,79 @@
     <a href="https://ys-uploads-prod2.s3.us-west-1.amazonaws.com/event_documents/50645/25b1ea18-8f1b-46de-aa66-0066a674911e.pdf" target="_blank" rel="noopener">NOR Amendment 1 (PDF)</a>
     <a href="https://yachtscoring.com/emenu/50645" target="_blank" rel="noopener">YachtScoring event page</a>
   </nav>
+
+  <details class="controls" id="briefing">
+    <summary>Race briefing — our start, requirements &amp; checklists</summary>
+    <div class="controls-body brf">
+
+      <div class="keycard">
+        <div class="kc-title">Zammermoos start — Spinnaker Division 9 · numeral flag <span class="num">9</span> on the backstay</div>
+        <table class="seq">
+          <tr><td class="t num" id="brfWarn">13:50</td><td>Warning — division flags hoisted, 1 sound</td></tr>
+          <tr><td class="t num" id="brfPrep">13:51</td><td>Preparatory — P flag up, 1 sound</td></tr>
+          <tr><td class="t num" id="brfOne">13:54</td><td>One minute — P flag down, 1 long sound</td></tr>
+          <tr><td class="t num" id="brfStart">13:55</td><td><strong>START</strong> — division flags down, 1 sound</td></tr>
+        </table>
+        <p>Line: ~0.25 nm NE of Ellis Island (40°42.17′N / 74°02.20′W), between the orange flag on the <em>Honorable Willie Wall</em> (signal vessel) and the orange flag on the pin-end vessel (blue RC flag). Flag <strong>L</strong> = line moved south, pin-end vessel becomes signal vessel. Start announcements on <strong>VHF 71</strong>. Times above follow the Div 9 start set in Race setup.</p>
+        <p>Postponement: <strong>AP</strong> + 2 sounds, 5-min multiples; new warning 1 min after AP down; start order unchanged. Individual recall: flag <strong>X</strong> + 1 sound (our start is our responsibility — RC hail on 71 is a courtesy). General recall: <strong>First Substitute</strong> + 2 sounds; new warning 1 min after lowering.</p>
+      </div>
+
+      <h3>Comms card</h3>
+      <div class="comms">
+        <div class="cc"><span class="cl">Regatta Desk — call/text</span><span class="cv num"><a href="tel:+15169459209">516-945-9209</a></span></div>
+        <div class="cc"><span class="cl">Start announcements</span><span class="cv">VHF 71</span></div>
+        <div class="cc"><span class="cl">Regatta Desk + finish vessel</span><span class="cv">VHF 69</span></div>
+        <div class="cc"><span class="cl">Official messages</span><span class="cv">ALIR 2026 Regatta Desk WhatsApp</span></div>
+        <div class="cc"><span class="cl">Photos / OBR trophy</span><span class="cv">ALIR 2026 Competitors WhatsApp · #alir2026 @alir_seacliff</span></div>
+        <div class="cc"><span class="cl">Email</span><span class="cv"><a href="mailto:alir@seacliffyc.org">alir@seacliffyc.org</a></span></div>
+      </div>
+
+      <h3>Key requirements</h3>
+      <ul class="plain">
+        <li><strong>Check-in (required, no VHF check-in):</strong> from 1100 Thu — text <span class="num">516-945-9209</span> or the Regatta Desk WhatsApp with boat name, sail number, division. Message once only. Not starting → send "DNS".</li>
+        <li><strong>YB tracker:</strong> mount the OA-supplied transponder on deck with clear sky view (pushpit/davit). Report any failure to the RC. Return to Sea Cliff YC after finishing — by Fri Jul 31 per the SI (NOR says Aug 1) — or the replacement cost is charged.</li>
+        <li><strong>AIS:</strong> required by SER, must transmit <em>Zammermoos</em> (entered name), not an MMSI or former name. If it can't, text/WhatsApp the transmitted name, entered name and sail number before the start. [NP] A station failing to receive tracker/AIS signals is not grounds for protest or redress.</li>
+        <li><strong>Night rules (NOR Amd 1):</strong> between sunset and sunrise, RRS Part 2 is replaced by IRPCAS/COLREGS.</li>
+        <li><strong>Course (ALI, 207 nm scoring):</strong> only mandatory mark is Ambrose Channel Red Bell Q R "14" (40°31.68′N / 74°00.57′W) to port; all other government marks may be disregarded.</li>
+        <li><strong>Montauk report (required):</strong> as soon as possible after Montauk Point Light bears <strong>270° magnetic</strong>, phone/text/WhatsApp: name, sail number, division, rounding time.</li>
+        <li><strong>Finish:</strong> blue flag on the finish vessel ~0.075 nm due W of the Glen Cove Breakwater light (40°51.72′N / 73°39.62′W) to the breakwater. The breakwater extends ~25 ft <em>west</em> of the green flashing light — leave room. Hail the finish vessel on VHF 69 when approaching; at night also flash a light on the sail numbers.</li>
+        <li><strong>Crew:</strong> minimum 4 aboard (our division). Sail numbers on all sails per RRS App G (tape OK).</li>
+        <li><strong>Equipment:</strong> US Sailing SER for Coastal races applies (working AIS transponder included); self-righting, properly rigged and ballasted.</li>
+        <li><strong>Penalties:</strong> RRS 44.3 scoring penalty applies — for Part 2 incidents, OCS, or tracking/AIS breaches the PC may add 2% to elapsed time instead of DSQ. Protests: delivered in person to the Regatta Desk at Sea Cliff YC within 2 h of our finish; hearings from 1100 Sun.</li>
+        <li><strong>Overdue:</strong> not finished by 1200 Sun Jul 27 → call/text/WhatsApp boat name, division and position (avoids a SAR callout).</li>
+        <li><strong>Withdrawal:</strong> notify the Regatta Desk immediately by phone/text/WhatsApp.</li>
+      </ul>
+
+      <h3>Pre-start checklist</h3>
+      <ul class="chk">
+        <li><label><input type="checkbox" data-ck="yb"><span>YB transponder aboard, mounted on deck with clear sky view</span></label></li>
+        <li><label><input type="checkbox" data-ck="ais"><span>AIS on and transmitting "Zammermoos" — not MMSI or former name</span></label></li>
+        <li><label><input type="checkbox" data-ck="flag9"><span>Numeral flag 9 flying from the backstay</span></label></li>
+        <li><label><input type="checkbox" data-ck="sailnum"><span>Sail numbers on every sail (App G; tape acceptable)</span></label></li>
+        <li><label><input type="checkbox" data-ck="ser"><span>SER Coastal equipment aboard; crew of 4+ and crew list filed on YachtScoring</span></label></li>
+        <li><label><input type="checkbox" data-ck="checkin"><span>Checked in after 1100: "Zammermoos, Uni 4224, Div 9" → text 516-945-9209 (once)</span></label></li>
+        <li><label><input type="checkbox" data-ck="vhf"><span>VHF on 71 for start announcements; watching for AP / X / First Sub</span></label></li>
+        <li><label><input type="checkbox" data-ck="wa"><span>Joined both WhatsApp groups; Regatta Desk number saved aboard</span></label></li>
+      </ul>
+
+      <h3>Underway</h3>
+      <ul class="chk">
+        <li><label><input type="checkbox" data-ck="ambrose"><span>Ambrose Channel Red Bell Q R "14" left to port</span></label></li>
+        <li><label><input type="checkbox" data-ck="montauk"><span>Montauk Light bore 270°M → rounding report sent (name, sail, div, time)</span></label></li>
+        <li><label><input type="checkbox" data-ck="colregs"><span>Sunset watch briefed: COLREGS replace Part 2 until sunrise</span></label></li>
+        <li><label><input type="checkbox" data-ck="fin69"><span>Approaching finish: hailed finish vessel on VHF 69 (night: light on sail numbers)</span></label></li>
+      </ul>
+
+      <h3>After finishing</h3>
+      <ul class="chk">
+        <li><label><input type="checkbox" data-ck="protest"><span>Protest decision made within 2 h of finish (in person, Regatta Desk at SCYC)</span></label></li>
+        <li><label><input type="checkbox" data-ck="ybret"><span>YB transponder returned to Sea Cliff YC (by Fri Jul 31)</span></label></li>
+      </ul>
+
+      <p class="src">Sources: Final 2026 ALIR Sailing Instructions v1.0 and Notice of Race Amendment 1 (linked above). Checklist ticks persist on this device.</p>
+      <button class="reset" id="ckReset" type="button">Clear checklist</button>
+    </div>
+  </details>
 
   <details class="controls">
     <summary>Race setup — start times &amp; distances</summary>
@@ -458,6 +564,16 @@
     document.getElementById("selfStart").textContent = state.starts[self.div];
     var sr = document.getElementById("selfRating");
     if (sr !== document.activeElement) sr.value = ratingOf(self);
+    var ss = startSecs(self.div);
+    var hm = function (s) {
+      var pad = function (n) { return (n < 10 ? "0" : "") + n; };
+      return pad(Math.floor(s / 3600)) + ":" + pad(Math.floor((s % 3600) / 60));
+    };
+    var seq = { brfWarn: ss - 300, brfPrep: ss - 240, brfOne: ss - 60, brfStart: ss };
+    for (var id in seq) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = hm(Math.max(0, seq[id]));
+    }
   }
 
   function renderFleet() {
@@ -657,6 +773,28 @@
     state = JSON.parse(JSON.stringify(DEFAULTS));
     renderAll(true);
   });
+
+  var CK_KEY = "alir2026-checklist-v1";
+  var briefing = document.getElementById("briefing");
+  if (briefing) {
+    var ckState = {};
+    try { ckState = JSON.parse(localStorage.getItem(CK_KEY)) || {}; } catch (e) { ckState = {}; }
+    briefing.querySelectorAll("input[data-ck]").forEach(function (c) {
+      if (ckState[c.dataset.ck]) c.checked = true;
+    });
+    briefing.addEventListener("change", function (e) {
+      var t = e.target;
+      if (t && t.dataset && t.dataset.ck) {
+        ckState[t.dataset.ck] = t.checked;
+        try { localStorage.setItem(CK_KEY, JSON.stringify(ckState)); } catch (err) { /* private mode */ }
+      }
+    });
+    document.getElementById("ckReset").addEventListener("click", function () {
+      ckState = {};
+      try { localStorage.removeItem(CK_KEY); } catch (err) { /* ignore */ }
+      briefing.querySelectorAll("input[data-ck]").forEach(function (c) { c.checked = false; });
+    });
+  }
 
   renderAll(true);
   setInterval(renderClock, 1000);
