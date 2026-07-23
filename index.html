@@ -579,7 +579,7 @@
     var sc = document.getElementById("ourSec");
     if (sc !== document.activeElement) sc.value = of ? of.sec : "0";
     document.getElementById("fbHint").textContent = of
-      ? "Red-margin boats below now show their drop-dead finish time: if that moment passes before they finish, we have them beat on corrected."
+      ? "Red-margin boats show a countdown: time left for them to finish and still beat us. When it expires, we have them beat on corrected (unless they had already finished)."
       : "After we finish, set our finish time here — every boat we owe time gets a deadline and a live countdown for them to beat us.";
   }
 
@@ -641,9 +641,7 @@
         var of = ourFinishSecs();
         if (!isSelf && m !== null && m < 0 && of !== null) {
           var dl = of - m;
-          var dlDay = Math.floor(dl / 86400);
-          ddl = '<span class="ddl">to beat us they must finish &lt; <span class="num">' + esc(dayLabel(dlDay)) + " " +
-            fmtClock(dl - dlDay * 86400) + '</span><span class="cd num" data-deadline="' + dl + '"></span></span>';
+          ddl = '<span class="ddl"><span class="cd num" data-deadline="' + dl + '"></span></span>';
         }
         var cells =
           '<td class="bname">' + nameCell + '<span class="btype">' + esc(b.sail) + " · " + esc(b.type) + "</span></td>" +
@@ -779,8 +777,8 @@
       var nowSecs = (now - raceDay(0)) / 1000;
       cds.forEach(function (c) {
         var rem = +c.dataset.deadline - nowSecs;
-        if (rem > 0) { c.textContent = " · " + fmt(rem) + " left"; c.classList.remove("safe"); }
-        else { c.textContent = " · passed — beaten unless already finished"; c.classList.add("safe"); }
+        if (rem > 0) { c.textContent = fmt(rem) + " left"; c.classList.remove("safe"); }
+        else { c.textContent = "expired — beaten"; c.classList.add("safe"); }
       });
     }
   }
