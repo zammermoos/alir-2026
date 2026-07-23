@@ -216,7 +216,7 @@
     background: var(--bg); color: var(--ink); min-height: 44px; width: 100%;
   }
   .finishbar button.reset { margin-top: 0; flex: none; }
-  .finishbar .fb-hint { flex-basis: 100%; font-size: 12px; color: var(--ink-soft); }
+  .fb-hint { flex-basis: 100%; font-size: 12px; color: var(--ink-soft); }
   .ddl { display: block; font-size: 11.5px; color: var(--ink-soft); margin-top: 3px; font-weight: 400; }
   .cd.safe { color: var(--stbd); font-weight: 600; }
 
@@ -241,6 +241,38 @@
   .hh .ratedit { display: flex; gap: 8px; align-items: flex-end; }
   .hh .ratedit .ctl { max-width: 130px; }
 
+  .controls-body .calc {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    padding: 10px 12px; margin-top: 8px;
+  }
+  .controls-body .calc .ctl { flex: 1; min-width: 110px; }
+  .controls-body .calc select, .controls-body .calc input[type="text"] {
+    font: inherit; padding: 8px; border: 1px solid var(--line); border-radius: 6px;
+    background: var(--bg); color: var(--ink); min-height: 44px; width: 100%;
+  }
+  .controls-body .calc .target { flex-basis: 100%; font-size: 15px; }
+  .controls-body .calc .target .num { font-size: 17px; font-weight: 700; }
+  .controls-body .calc button.reset { margin-top: 0; flex: none; }
+  .mini-wrap { overflow-x: auto; }
+  table.mini { width: 100%; border-collapse: collapse; background: var(--surface); font-size: 13.5px; margin-top: 8px; }
+  table.mini th {
+    text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--ink-soft); padding: 6px 8px; border-bottom: 1px solid var(--line);
+  }
+  table.mini td { padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: baseline; }
+  table.mini td.r, table.mini th.r { text-align: right; white-space: nowrap; }
+  .flood { color: var(--stbd); }
+  .ebb { color: var(--port); }
+  .fin-mark { color: var(--stbd); font-weight: 700; margin-left: 6px; font-size: 12px; }
+  #curHost details { margin: 8px 0; }
+  #curHost summary { cursor: pointer; font-weight: 600; padding: 8px 0; min-height: 44px; display: flex; align-items: center; gap: 6px; }
+  #curHost summary::after { content: "▾"; margin-left: auto; color: var(--ink-soft); transition: transform .15s; }
+  #curHost details[open] > summary::after { transform: rotate(180deg); }
+  #curHost summary::-webkit-details-marker { display: none; }
+  #qrBox img { max-width: min(70vw, 320px); height: auto; image-rendering: pixelated; border: 8px solid #fff; border-radius: 8px; }
+  #sndBtn { margin-top: 0; align-self: center; }
+
   footer.note { margin-top: 26px; font-size: 12.5px; color: var(--ink-soft); border-top: 1px solid var(--line); padding-top: 12px; }
   footer.note p { margin: 6px 0; }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
@@ -264,6 +296,7 @@
     <div><span class="lbl">To our start</span><span class="val num" id="nowToStart">--:--</span></div>
     <div><span class="lbl">Our elapsed</span><span class="val num" id="nowElapsed">pre-start</span></div>
     <div><span class="lbl">Course</span><span class="val num" id="nowDist">207 nm</span></div>
+    <button class="reset" id="sndBtn" type="button">🔕 Start sounds off</button>
     <div class="tz">Clock and elapsed use this device's timezone — keep the device on race-local (Eastern) time.</div>
   </div>
 
@@ -361,6 +394,25 @@
     </div>
   </details>
 
+  <details class="controls" id="advcalc">
+    <summary>Advanced — target speed &amp; device sync</summary>
+    <div class="controls-body brf">
+      <h3>Target speed vs a rival</h3>
+      <p class="src">From the tracker: their distance to finish and current speed, plus our distance to finish. Result: the average speed we must hold to beat them on corrected.</p>
+      <div class="calc">
+        <div class="ctl"><label for="tsBoat">Rival</label><select id="tsBoat"></select></div>
+        <div class="ctl"><label for="tsTheirDtf">Their DTF (nm)</label><input id="tsTheirDtf" type="number" step="0.1" min="0" inputmode="decimal"></div>
+        <div class="ctl"><label for="tsTheirSpd">Their speed (kn)</label><input id="tsTheirSpd" type="number" step="0.1" min="0.1" inputmode="decimal"></div>
+        <div class="ctl"><label for="tsOurDtf">Our DTF (nm)</label><input id="tsOurDtf" type="number" step="0.1" min="0" inputmode="decimal"></div>
+        <div class="target" id="tsOut"></div>
+      </div>
+      <h3>Sync to another device</h3>
+      <p class="src">Scan from the skipper's phone: carries our finish time, logged finishes, start edits and ratings. The other device confirms before applying.</p>
+      <button class="reset" id="qrBtn" type="button">Show QR code</button>
+      <div id="qrBox" style="margin-top:10px"></div>
+    </div>
+  </details>
+
   <div class="legend">
     <span class="chip"><span class="dot" style="background:var(--stbd)"></span>They owe us — they can finish ahead of us by anything <em>less</em> than the margin (clock time) and we still beat them</span>
     <span class="chip"><span class="dot" style="background:var(--port)"></span>We owe them — we must finish <em>more</em> than the margin ahead of them (clock time)</span>
@@ -376,6 +428,35 @@
 
   <div id="fleet"></div>
 
+  <details class="controls" id="tracker">
+    <summary>Live tracker — YB positions &amp; projected standings</summary>
+    <div class="controls-body brf">
+      <div class="calc">
+        <div class="ctl"><label for="ybRace">YB race id</label><input id="ybRace" type="text" value="alir26"></div>
+        <button class="reset" id="ybBtn" type="button">Refresh from YB</button>
+        <div class="fb-hint" id="ybStatus">Fetches cf.yb.tl positions (needs signal). Projects every boat's finish at its current speed and ranks the fleet on corrected time.</div>
+      </div>
+      <div id="ybHost"></div>
+    </div>
+  </details>
+
+  <details class="controls" id="results">
+    <summary>Results — logged finishes &amp; standings</summary>
+    <div class="controls-body brf">
+      <p class="src">Log a boat's actual finish from its row (tap the boat, set day/time, then "Log as actual finish"). Standings compute corrected = elapsed − rating × distance. Our row uses the Our-finish bar.</p>
+      <div id="resHost"></div>
+    </div>
+  </details>
+
+  <details class="controls" id="currents">
+    <summary>Currents — race week (NOAA predictions)</summary>
+    <div class="controls-body brf">
+      <p class="src">Max flood/ebb and slack from NOAA CO-OPS, baked in for Jul 23–27 (local time) so it works offline. Green = flood, red = ebb (kn). Stations run down-course: Narrows → Ambrose → Montauk → The Race / Plum Gut → Matinecock (finish approach).</p>
+      <div id="curHost"></div>
+    </div>
+  </details>
+
+
   <footer class="note">
     <p><strong>How margins are figured:</strong> margin = (our start − their start) + (our rating × our distance − their rating × their distance). Because start staggers are folded in, every margin reads directly in <em>finish-line clock time</em>: green means they can cross ahead of us by anything less than that margin and we still win on corrected; red means we must cross more than that margin ahead of them. Finishing separated by exactly the margin is a corrected-time dead heat.</p>
     <p><strong>ORC Division 0</strong> is scored under ORC APH, a different handicap system — corrected times there are not comparable to PHRF, so no margin is shown. <strong>Nomad</strong> (Div 6) sails the Around-the-Islands course; her margin uses the 230 nm ATI distance and is a paper comparison across different courses.</p>
@@ -383,6 +464,7 @@
   </footer>
 </div>
 
+<script src="qrcode.js"></script>
 <script>
 (function () {
   "use strict";
@@ -457,7 +539,7 @@
     { div: "d9", sail: "Uni 4224", name: "Zammermoos", type: "Club Swan 42", rating: -15 }
   ];
 
-  var DEFAULTS = { dALI: 207, dATI: 230, raceDate: "2026-07-23", starts: {}, ratings: {}, ourFinish: null };
+  var DEFAULTS = { dALI: 207, dATI: 230, raceDate: "2026-07-23", starts: {}, ratings: {}, ourFinish: null, finishes: {} };
   DIVISIONS.forEach(function (d) { DEFAULTS.starts[d.id] = d.start; });
   BOATS.forEach(function (b) { DEFAULTS.ratings[b.name] = b.rating; });
 
@@ -476,21 +558,33 @@
     for (var k in cur) if (cur[k] !== def[k]) out[k] = cur[k];
     return out;
   }
-  function save() {
-    var out = {
-      starts: diffMap(state.starts, DEFAULTS.starts),
-      ratings: diffMap(state.ratings, DEFAULTS.ratings)
-    };
+  function buildDiff() {
+    var out = {};
+    var ds = diffMap(state.starts, DEFAULTS.starts);
+    var dr = diffMap(state.ratings, DEFAULTS.ratings);
+    if (Object.keys(ds).length) out.starts = ds;
+    if (Object.keys(dr).length) out.ratings = dr;
     if (state.dALI !== DEFAULTS.dALI) out.dALI = state.dALI;
     if (state.dATI !== DEFAULTS.dATI) out.dATI = state.dATI;
     if (state.raceDate !== DEFAULTS.raceDate) out.raceDate = state.raceDate;
     if (state.ourFinish) out.ourFinish = state.ourFinish;
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(out)); } catch (e) { /* private mode */ }
+    var fks = Object.keys(state.finishes);
+    if (fks.length) {
+      out.finishes = {};
+      fks.forEach(function (k) {
+        var f = state.finishes[k];
+        out.finishes[k] = f.day + "|" + f.time + "|" + f.sec;
+      });
+    }
+    return out;
   }
-  function load() {
+  function save() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(buildDiff())); } catch (e) { /* private mode */ }
+  }
+  function load(rawOverride) {
     var base = JSON.parse(JSON.stringify(DEFAULTS));
     try {
-      var raw = localStorage.getItem(STORE_KEY);
+      var raw = rawOverride !== undefined ? rawOverride : localStorage.getItem(STORE_KEY);
       if (raw) {
         var s = JSON.parse(raw);
         if (s.dALI != null && +s.dALI > 0) base.dALI = +s.dALI;
@@ -498,6 +592,16 @@
         if (typeof s.raceDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.raceDate)) base.raceDate = s.raceDate;
         if (s.ourFinish && typeof s.ourFinish.time === "string" && /^\d{2}:\d{2}$/.test(s.ourFinish.time)) {
           base.ourFinish = { day: String(s.ourFinish.day || "0"), time: s.ourFinish.time, sec: String(s.ourFinish.sec || "0") };
+        }
+        if (s.finishes) for (var fb in s.finishes) {
+          var fv = s.finishes[fb];
+          if (typeof fv === "string") {
+            var fp = fv.split("|");
+            fv = { day: fp[0], time: fp[1], sec: fp[2] };
+          }
+          if (fb in base.ratings && fv && typeof fv.time === "string" && /^\d{2}:\d{2}$/.test(fv.time)) {
+            base.finishes[fb] = { day: String(fv.day || "0"), time: fv.time, sec: String(fv.sec || "0") };
+          }
         }
         if (s.starts) for (var d in s.starts) {
           if (d in base.starts && /^\d{2}:\d{2}$/.test(s.starts[d])) base.starts[d] = s.starts[d];
@@ -558,13 +662,13 @@
   function slug(name) { return name.replace(/[^a-zA-Z0-9]+/g, "-").toLowerCase(); }
   function cssEsc(s) { return window.CSS && CSS.escape ? CSS.escape(s) : s.replace(/"/g, '\\"'); }
 
-  function ourFinishSecs() {
-    var of = state.ourFinish;
+  function fSecs(of) {
     if (!of || !of.time) return null;
     var p = of.time.split(":");
     var s = Math.min(59, Math.max(0, parseInt(of.sec, 10) || 0));
     return (+of.day) * 86400 + (+p[0]) * 3600 + (+p[1]) * 60 + s;
   }
+  function ourFinishSecs() { return fSecs(state.ourFinish); }
 
   function renderFinishBar() {
     var of = state.ourFinish;
@@ -638,6 +742,7 @@
           ? esc(b.name)
           : '<button type="button" class="boat-toggle" aria-expanded="' + (openBoat === b.name) +
             '" aria-controls="det-' + slug(b.name) + '">' + esc(b.name) + "</button>";
+        var finMark = (isSelf ? state.ourFinish : state.finishes[b.name]) ? '<span class="fin-mark">✓</span>' : "";
         var ddl = "";
         var of = ourFinishSecs();
         if (!isSelf && m !== null && m < 0 && of !== null) {
@@ -645,7 +750,7 @@
           ddl = '<span class="ddl"><span class="cd num" data-deadline="' + dl + '"></span></span>';
         }
         var cells =
-          '<td class="bname">' + nameCell + '<span class="btype">' + esc(b.sail) + " · " + esc(b.type) + "</span></td>" +
+          '<td class="bname">' + nameCell + finMark + '<span class="btype">' + esc(b.sail) + " · " + esc(b.type) + "</span></td>" +
           '<td class="rating num">' + ratingOf(b) + "</td>" +
           '<td class="margin">' + (isSelf ? '<span class="badge even">us</span>' : badge(m) + ddl) + "</td>";
         var main = '<tr class="boat' + (isSelf ? " self" : "") + '" data-boat="' + esc(b.name) + '">' + cells + "</tr>";
@@ -709,9 +814,13 @@
     var ratedit =
       '<div class="ratedit"><div class="ctl"><label for="hh-rate">' + (d.system === "ORC" ? "APH" : "Rating") +
       ' (edit if scratch changes)</label><input id="hh-rate" type="number" step="0.1" inputmode="decimal" value="' + ratingOf(b) + '"></div></div>';
+    var logbtns = m === null ? "" :
+      '<div class="ratedit"><button class="reset" id="hh-log" type="button">' +
+      (state.finishes[b.name] ? "Update logged finish (day/time above)" : "Log as actual finish (day/time above)") + "</button>" +
+      (state.finishes[b.name] ? '<button class="reset" id="hh-unlog" type="button">Clear logged finish</button>' : "") + "</div>";
     return '<tr class="detail" id="det-' + slug(b.name) + '"><td colspan="3"><div class="hh">' +
       '<div class="verdict">' + verdict + "</div>" +
-      '<div class="brk num">' + brk + "</div>" + calc + ratedit +
+      '<div class="brk num">' + brk + "</div>" + calc + ratedit + logbtns +
       "</div></td></tr>";
   }
 
@@ -761,6 +870,32 @@
         rate.value = ratingOf(b);
       }
     });
+    var logBtn = document.getElementById("hh-log");
+    if (logBtn) logBtn.addEventListener("click", function () {
+      if (!time || !time.value) { if (out) out.textContent = "Set their finish day/time above first."; return; }
+      var lp = time.value.split(":");
+      var lsec = Math.min(59, Math.max(0, parseInt(sec && sec.value, 10) || 0));
+      var lf = (+day.value) * 86400 + (+lp[0]) * 3600 + (+lp[1]) * 60 + lsec;
+      if (lf <= startSecs(b.div)) {
+        if (out) out.textContent = "Not logged — that finish is at or before their " + state.starts[b.div] + " start; check the day selected.";
+        return;
+      }
+      state.finishes[b.name] = { day: day.value, time: time.value, sec: String(lsec) };
+      save();
+      renderFleet();
+      renderResults();
+      var again = document.getElementById("hh-log");
+      if (again) again.focus();
+    });
+    var unlogBtn = document.getElementById("hh-unlog");
+    if (unlogBtn) unlogBtn.addEventListener("click", function () {
+      delete state.finishes[b.name];
+      save();
+      renderFleet();
+      renderResults();
+      var again = document.getElementById("hh-log");
+      if (again) again.focus();
+    });
     recalc();
   }
 
@@ -774,6 +909,13 @@
     var el = (now - startDT) / 1000;
     document.getElementById("nowElapsed").textContent = el < 0 ? "pre-start" : fmt(el);
     document.getElementById("nowToStart").textContent = el < 0 ? fmt(-el) : "started";
+    var toStart = -el;
+    if (sndArmed && prevToStart !== null) {
+      [[300, 880, 0.5], [240, 880, 0.5], [60, 660, 1.2], [0, 990, 0.9]].forEach(function (th) {
+        if (prevToStart > th[0] && toStart <= th[0] && toStart > th[0] - 30) beep(th[1], th[2]);
+      });
+    }
+    prevToStart = toStart;
     var cds = document.querySelectorAll(".cd[data-deadline]");
     if (cds.length) {
       var nowSecs = (now - raceDay(0)) / 1000;
@@ -790,6 +932,7 @@
     renderControls(rebuildControls);
     renderFinishBar();
     renderFleet();
+    renderResults();
     renderClock();
   }
 
@@ -854,6 +997,7 @@
     save();
     renderFleet();
     renderFinishBar();
+    renderResults();
     renderClock();
   }
   ["ourDay", "ourTime", "ourSec"].forEach(function (id) {
@@ -864,7 +1008,253 @@
     save();
     renderFleet();
     renderFinishBar();
+    renderResults();
   });
+
+  // ---- results / standings ----
+  function renderResults() {
+    var host = document.getElementById("resHost");
+    var entries = [];
+    BOATS.forEach(function (b) {
+      if (divOf(b).system !== "PHRF") return;
+      var fs = b.name === SELF ? ourFinishSecs() : fSecs(state.finishes[b.name]);
+      if (fs === null) return;
+      var elapsed = fs - startSecs(b.div);
+      if (elapsed <= 0) return;
+      entries.push({ b: b, fs: fs, elapsed: elapsed, corrected: elapsed - ratingOf(b) * distOf(b) });
+    });
+    if (!entries.length) {
+      host.innerHTML = '<p class="src">No finishes logged yet.</p>';
+      return;
+    }
+    entries.sort(function (x, y) { return x.corrected - y.corrected; });
+    var us = null;
+    entries.forEach(function (e) { if (e.b.name === SELF) us = e; });
+    var rows = entries.map(function (e, i) {
+      var delta;
+      if (e.b.name === SELF) delta = "us";
+      else if (!us) delta = "—";
+      else {
+        var dv = e.corrected - us.corrected;
+        delta = (dv >= 0 ? "+" : "−") + fmt(dv);
+      }
+      var fd = Math.floor(e.fs / 86400);
+      return "<tr" + (e.b.name === SELF ? ' style="background:var(--self-bg)"' : "") + "><td>" + (i + 1) + "</td>" +
+        "<td>" + esc(e.b.name) + (divOf(e.b).course === "ATI" ? ' <span class="src">(ATI)</span>' : "") + "</td>" +
+        "<td>" + esc(divOf(e.b).name.replace("Spinnaker ", "").replace("Double-Handed ", "DH ")) + "</td>" +
+        '<td class="r num">' + esc(dayLabel(fd)) + " " + fmtClock(e.fs - fd * 86400) + "</td>" +
+        '<td class="r num">' + fmt(e.elapsed) + "</td>" +
+        '<td class="r num">' + fmt(e.corrected) + "</td>" +
+        '<td class="r num">' + delta + "</td></tr>";
+    }).join("");
+    host.innerHTML = '<div class="mini-wrap"><table class="mini"><thead><tr><th>#</th><th>Boat</th><th>Div</th>' +
+      '<th class="r">Finish</th><th class="r">Elapsed</th><th class="r">Corrected</th><th class="r">vs us</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+  }
+
+  // ---- currents (NOAA, baked for race week) ----
+  var CURRENTS = [{"name":"The Narrows (Verrazano)","sid":"n03020","rows":[{"t":"2026-07-23 00:44","v":0.0,"type":"slack"},{"t":"2026-07-23 03:59","v":1.0,"type":"flood"},{"t":"2026-07-23 05:48","v":0.0,"type":"slack"},{"t":"2026-07-23 09:40","v":-1.9,"type":"ebb"},{"t":"2026-07-23 12:34","v":-0.0,"type":"slack"},{"t":"2026-07-23 16:15","v":1.4,"type":"flood"},{"t":"2026-07-23 18:36","v":0.0,"type":"slack"},{"t":"2026-07-23 22:35","v":-1.8,"type":"ebb"},{"t":"2026-07-24 01:56","v":0.0,"type":"slack"},{"t":"2026-07-24 04:57","v":1.1,"type":"flood"},{"t":"2026-07-24 06:51","v":0.0,"type":"slack"},{"t":"2026-07-24 10:32","v":-1.9,"type":"ebb"},{"t":"2026-07-24 13:27","v":0.0,"type":"slack"},{"t":"2026-07-24 17:10","v":1.5,"type":"flood"},{"t":"2026-07-24 19:35","v":0.0,"type":"slack"},{"t":"2026-07-24 23:27","v":-1.9,"type":"ebb"},{"t":"2026-07-25 02:59","v":0.0,"type":"slack"},{"t":"2026-07-25 05:53","v":1.2,"type":"flood"},{"t":"2026-07-25 07:48","v":0.0,"type":"slack"},{"t":"2026-07-25 11:20","v":-2.0,"type":"ebb"},{"t":"2026-07-25 14:15","v":-0.0,"type":"slack"},{"t":"2026-07-25 18:02","v":1.5,"type":"flood"},{"t":"2026-07-25 20:26","v":0.0,"type":"slack"},{"t":"2026-07-26 00:18","v":-1.9,"type":"ebb"},{"t":"2026-07-26 03:52","v":0.0,"type":"slack"},{"t":"2026-07-26 06:44","v":1.2,"type":"flood"},{"t":"2026-07-26 08:38","v":-0.0,"type":"slack"},{"t":"2026-07-26 12:07","v":-1.9,"type":"ebb"},{"t":"2026-07-26 15:01","v":0.0,"type":"slack"},{"t":"2026-07-26 18:49","v":1.5,"type":"flood"},{"t":"2026-07-26 21:09","v":0.0,"type":"slack"},{"t":"2026-07-27 01:06","v":-1.9,"type":"ebb"},{"t":"2026-07-27 04:35","v":0.0,"type":"slack"},{"t":"2026-07-27 07:29","v":1.2,"type":"flood"},{"t":"2026-07-27 09:20","v":0.0,"type":"slack"},{"t":"2026-07-27 12:51","v":-1.8,"type":"ebb"},{"t":"2026-07-27 15:45","v":0.0,"type":"slack"},{"t":"2026-07-27 19:29","v":1.5,"type":"flood"},{"t":"2026-07-27 21:47","v":-0.0,"type":"slack"}]},{"name":"Ambrose Channel","sid":"NYH1903","rows":[{"t":"2026-07-23 01:59","v":0.4,"type":"flood"},{"t":"2026-07-23 04:16","v":0.0,"type":"slack"},{"t":"2026-07-23 08:48","v":-0.9,"type":"ebb"},{"t":"2026-07-23 11:41","v":0.0,"type":"slack"},{"t":"2026-07-23 14:05","v":0.6,"type":"flood"},{"t":"2026-07-23 17:11","v":0.0,"type":"slack"},{"t":"2026-07-23 21:39","v":-1.2,"type":"ebb"},{"t":"2026-07-24 00:45","v":0.0,"type":"slack"},{"t":"2026-07-24 02:51","v":0.4,"type":"flood"},{"t":"2026-07-24 05:16","v":0.0,"type":"slack"},{"t":"2026-07-24 09:45","v":-0.9,"type":"ebb"},{"t":"2026-07-24 12:27","v":0.0,"type":"slack"},{"t":"2026-07-24 14:51","v":0.6,"type":"flood"},{"t":"2026-07-24 18:13","v":0.0,"type":"slack"},{"t":"2026-07-24 22:29","v":-1.3,"type":"ebb"},{"t":"2026-07-25 01:37","v":0.0,"type":"slack"},{"t":"2026-07-25 04:02","v":0.4,"type":"flood"},{"t":"2026-07-25 06:16","v":0.0,"type":"slack"},{"t":"2026-07-25 10:30","v":-1.0,"type":"ebb"},{"t":"2026-07-25 13:10","v":0.0,"type":"slack"},{"t":"2026-07-25 16:01","v":0.7,"type":"flood"},{"t":"2026-07-25 19:07","v":0.0,"type":"slack"},{"t":"2026-07-25 23:09","v":-1.4,"type":"ebb"},{"t":"2026-07-26 02:24","v":0.0,"type":"slack"},{"t":"2026-07-26 04:58","v":0.4,"type":"flood"},{"t":"2026-07-26 07:10","v":0.0,"type":"slack"},{"t":"2026-07-26 11:07","v":-1.1,"type":"ebb"},{"t":"2026-07-26 13:53","v":0.0,"type":"slack"},{"t":"2026-07-26 16:52","v":0.8,"type":"flood"},{"t":"2026-07-26 19:55","v":0.0,"type":"slack"},{"t":"2026-07-26 23:45","v":-1.5,"type":"ebb"},{"t":"2026-07-27 03:04","v":0.0,"type":"slack"},{"t":"2026-07-27 05:35","v":0.5,"type":"flood"},{"t":"2026-07-27 07:57","v":0.0,"type":"slack"},{"t":"2026-07-27 11:42","v":-1.2,"type":"ebb"},{"t":"2026-07-27 14:36","v":0.0,"type":"slack"},{"t":"2026-07-27 17:20","v":0.9,"type":"flood"},{"t":"2026-07-27 20:37","v":0.0,"type":"slack"}]},{"name":"Montauk Pt, 1 mi NE","sid":"ACT2406","rows":[{"t":"2026-07-23 00:11","v":0.0,"type":"slack"},{"t":"2026-07-23 03:31","v":1.6,"type":"flood"},{"t":"2026-07-23 06:40","v":0.0,"type":"slack"},{"t":"2026-07-23 09:09","v":-1.4,"type":"ebb"},{"t":"2026-07-23 12:10","v":0.0,"type":"slack"},{"t":"2026-07-23 15:37","v":1.7,"type":"flood"},{"t":"2026-07-23 18:51","v":0.0,"type":"slack"},{"t":"2026-07-23 21:40","v":-1.8,"type":"ebb"},{"t":"2026-07-24 01:06","v":0.0,"type":"slack"},{"t":"2026-07-24 04:28","v":1.6,"type":"flood"},{"t":"2026-07-24 07:37","v":0.0,"type":"slack"},{"t":"2026-07-24 10:05","v":-1.4,"type":"ebb"},{"t":"2026-07-24 13:04","v":0.0,"type":"slack"},{"t":"2026-07-24 16:31","v":1.7,"type":"flood"},{"t":"2026-07-24 19:43","v":0.0,"type":"slack"},{"t":"2026-07-24 22:31","v":-1.8,"type":"ebb"},{"t":"2026-07-25 01:55","v":0.0,"type":"slack"},{"t":"2026-07-25 05:20","v":1.7,"type":"flood"},{"t":"2026-07-25 08:27","v":0.0,"type":"slack"},{"t":"2026-07-25 10:53","v":-1.5,"type":"ebb"},{"t":"2026-07-25 13:54","v":0.0,"type":"slack"},{"t":"2026-07-25 17:20","v":1.8,"type":"flood"},{"t":"2026-07-25 20:32","v":0.0,"type":"slack"},{"t":"2026-07-25 23:16","v":-1.9,"type":"ebb"},{"t":"2026-07-26 02:39","v":0.0,"type":"slack"},{"t":"2026-07-26 06:04","v":1.8,"type":"flood"},{"t":"2026-07-26 09:12","v":0.0,"type":"slack"},{"t":"2026-07-26 11:35","v":-1.6,"type":"ebb"},{"t":"2026-07-26 14:39","v":0.0,"type":"slack"},{"t":"2026-07-26 18:04","v":1.9,"type":"flood"},{"t":"2026-07-26 21:15","v":0.0,"type":"slack"},{"t":"2026-07-26 23:55","v":-1.9,"type":"ebb"},{"t":"2026-07-27 03:19","v":0.0,"type":"slack"},{"t":"2026-07-27 06:44","v":1.9,"type":"flood"},{"t":"2026-07-27 09:52","v":0.0,"type":"slack"},{"t":"2026-07-27 12:13","v":-1.7,"type":"ebb"},{"t":"2026-07-27 15:21","v":0.0,"type":"slack"},{"t":"2026-07-27 18:43","v":2.0,"type":"flood"},{"t":"2026-07-27 21:56","v":0.0,"type":"slack"}]},{"name":"The Race","sid":"LIS1001","rows":[{"t":"2026-07-23 02:01","v":0.0,"type":"slack"},{"t":"2026-07-23 05:05","v":2.3,"type":"flood"},{"t":"2026-07-23 07:55","v":0.0,"type":"slack"},{"t":"2026-07-23 10:53","v":-2.0,"type":"ebb"},{"t":"2026-07-23 13:57","v":0.0,"type":"slack"},{"t":"2026-07-23 17:07","v":2.4,"type":"flood"},{"t":"2026-07-23 20:06","v":-0.0,"type":"slack"},{"t":"2026-07-23 23:28","v":-2.7,"type":"ebb"},{"t":"2026-07-24 02:57","v":0.0,"type":"slack"},{"t":"2026-07-24 06:03","v":2.3,"type":"flood"},{"t":"2026-07-24 08:53","v":0.0,"type":"slack"},{"t":"2026-07-24 11:50","v":-2.1,"type":"ebb"},{"t":"2026-07-24 14:52","v":0.0,"type":"slack"},{"t":"2026-07-24 18:03","v":2.5,"type":"flood"},{"t":"2026-07-24 21:00","v":-0.0,"type":"slack"},{"t":"2026-07-25 00:22","v":-2.8,"type":"ebb"},{"t":"2026-07-25 03:48","v":0.0,"type":"slack"},{"t":"2026-07-25 06:54","v":2.4,"type":"flood"},{"t":"2026-07-25 09:45","v":-0.0,"type":"slack"},{"t":"2026-07-25 12:41","v":-2.2,"type":"ebb"},{"t":"2026-07-25 15:42","v":-0.0,"type":"slack"},{"t":"2026-07-25 18:53","v":2.6,"type":"flood"},{"t":"2026-07-25 21:49","v":0.0,"type":"slack"},{"t":"2026-07-26 01:09","v":-2.9,"type":"ebb"},{"t":"2026-07-26 04:33","v":0.0,"type":"slack"},{"t":"2026-07-26 07:39","v":2.5,"type":"flood"},{"t":"2026-07-26 10:30","v":-0.0,"type":"slack"},{"t":"2026-07-26 13:26","v":-2.4,"type":"ebb"},{"t":"2026-07-26 16:28","v":0.0,"type":"slack"},{"t":"2026-07-26 19:35","v":2.7,"type":"flood"},{"t":"2026-07-26 22:34","v":0.0,"type":"slack"},{"t":"2026-07-27 01:52","v":-3.1,"type":"ebb"},{"t":"2026-07-27 05:13","v":-0.0,"type":"slack"},{"t":"2026-07-27 08:18","v":2.7,"type":"flood"},{"t":"2026-07-27 11:10","v":0.0,"type":"slack"},{"t":"2026-07-27 14:08","v":-2.6,"type":"ebb"},{"t":"2026-07-27 17:09","v":0.0,"type":"slack"},{"t":"2026-07-27 20:12","v":2.9,"type":"flood"},{"t":"2026-07-27 23:15","v":0.0,"type":"slack"}]},{"name":"Plum Gut","sid":"LIS1012","rows":[{"t":"2026-07-23 00:46","v":-0.0,"type":"slack"},{"t":"2026-07-23 03:41","v":1.1,"type":"flood"},{"t":"2026-07-23 06:28","v":0.0,"type":"slack"},{"t":"2026-07-23 08:41","v":-2.0,"type":"ebb"},{"t":"2026-07-23 12:58","v":0.0,"type":"slack"},{"t":"2026-07-23 15:41","v":1.2,"type":"flood"},{"t":"2026-07-23 18:43","v":0.0,"type":"slack"},{"t":"2026-07-23 21:08","v":-2.4,"type":"ebb"},{"t":"2026-07-24 01:44","v":0.0,"type":"slack"},{"t":"2026-07-24 05:03","v":1.1,"type":"flood"},{"t":"2026-07-24 07:26","v":0.0,"type":"slack"},{"t":"2026-07-24 09:37","v":-1.9,"type":"ebb"},{"t":"2026-07-24 13:54","v":-0.0,"type":"slack"},{"t":"2026-07-24 16:53","v":1.2,"type":"flood"},{"t":"2026-07-24 19:40","v":0.0,"type":"slack"},{"t":"2026-07-24 22:06","v":-2.4,"type":"ebb"},{"t":"2026-07-25 02:38","v":0.0,"type":"slack"},{"t":"2026-07-25 06:13","v":1.3,"type":"flood"},{"t":"2026-07-25 08:23","v":-0.0,"type":"slack"},{"t":"2026-07-25 10:37","v":-2.0,"type":"ebb"},{"t":"2026-07-25 14:50","v":0.0,"type":"slack"},{"t":"2026-07-25 18:07","v":1.3,"type":"flood"},{"t":"2026-07-25 20:36","v":-0.0,"type":"slack"},{"t":"2026-07-25 23:05","v":-2.4,"type":"ebb"},{"t":"2026-07-26 03:30","v":0.0,"type":"slack"},{"t":"2026-07-26 07:01","v":1.4,"type":"flood"},{"t":"2026-07-26 09:16","v":-0.0,"type":"slack"},{"t":"2026-07-26 11:36","v":-2.1,"type":"ebb"},{"t":"2026-07-26 15:44","v":0.0,"type":"slack"},{"t":"2026-07-26 19:00","v":1.4,"type":"flood"},{"t":"2026-07-26 21:28","v":0.0,"type":"slack"},{"t":"2026-07-26 23:59","v":-2.5,"type":"ebb"},{"t":"2026-07-27 04:18","v":0.0,"type":"slack"},{"t":"2026-07-27 07:40","v":1.6,"type":"flood"},{"t":"2026-07-27 10:04","v":0.0,"type":"slack"},{"t":"2026-07-27 12:24","v":-2.3,"type":"ebb"},{"t":"2026-07-27 16:34","v":-0.0,"type":"slack"},{"t":"2026-07-27 19:42","v":1.5,"type":"flood"},{"t":"2026-07-27 22:17","v":0.0,"type":"slack"}]},{"name":"Matinecock Pt (Glen Cove)","sid":"LIS1035","rows":[{"t":"2026-07-23 01:14","v":-0.3,"type":"ebb"},{"t":"2026-07-23 03:05","v":0.0,"type":"slack"},{"t":"2026-07-23 04:43","v":0.2,"type":"flood"},{"t":"2026-07-23 07:00","v":0.2,"type":"flood"},{"t":"2026-07-23 08:50","v":0.0,"type":"slack"},{"t":"2026-07-23 10:43","v":-0.2,"type":"ebb"},{"t":"2026-07-23 12:02","v":-0.2,"type":"ebb"},{"t":"2026-07-23 13:40","v":-0.3,"type":"ebb"},{"t":"2026-07-23 15:24","v":0.0,"type":"slack"},{"t":"2026-07-23 17:07","v":0.2,"type":"flood"},{"t":"2026-07-23 19:33","v":0.3,"type":"flood"},{"t":"2026-07-23 21:28","v":0.0,"type":"slack"},{"t":"2026-07-24 02:04","v":-0.3,"type":"ebb"},{"t":"2026-07-24 03:56","v":0.0,"type":"slack"},{"t":"2026-07-24 07:46","v":0.3,"type":"flood"},{"t":"2026-07-24 09:42","v":0.0,"type":"slack"},{"t":"2026-07-24 11:37","v":-0.3,"type":"ebb"},{"t":"2026-07-24 12:47","v":-0.2,"type":"ebb"},{"t":"2026-07-24 14:27","v":-0.3,"type":"ebb"},{"t":"2026-07-24 16:14","v":0.0,"type":"slack"},{"t":"2026-07-24 20:13","v":0.3,"type":"flood"},{"t":"2026-07-24 22:12","v":0.0,"type":"slack"},{"t":"2026-07-25 02:47","v":-0.4,"type":"ebb"},{"t":"2026-07-25 04:41","v":0.0,"type":"slack"},{"t":"2026-07-25 08:23","v":0.3,"type":"flood"},{"t":"2026-07-25 10:30","v":0.0,"type":"slack"},{"t":"2026-07-25 12:34","v":-0.3,"type":"ebb"},{"t":"2026-07-25 13:39","v":-0.3,"type":"ebb"},{"t":"2026-07-25 15:08","v":-0.3,"type":"ebb"},{"t":"2026-07-25 16:58","v":0.0,"type":"slack"},{"t":"2026-07-25 18:56","v":0.3,"type":"flood"},{"t":"2026-07-25 20:40","v":0.3,"type":"flood"},{"t":"2026-07-25 22:51","v":0.0,"type":"slack"},{"t":"2026-07-26 01:13","v":-0.4,"type":"ebb"},{"t":"2026-07-26 03:24","v":-0.4,"type":"ebb"},{"t":"2026-07-26 05:22","v":0.0,"type":"slack"},{"t":"2026-07-26 07:24","v":0.4,"type":"flood"},{"t":"2026-07-26 11:16","v":0.0,"type":"slack"},{"t":"2026-07-26 13:28","v":-0.3,"type":"ebb"},{"t":"2026-07-26 15:43","v":-0.3,"type":"ebb"},{"t":"2026-07-26 17:39","v":0.0,"type":"slack"},{"t":"2026-07-26 19:35","v":0.4,"type":"flood"},{"t":"2026-07-26 23:28","v":0.0,"type":"slack"},{"t":"2026-07-27 01:55","v":-0.4,"type":"ebb"},{"t":"2026-07-27 06:00","v":0.0,"type":"slack"},{"t":"2026-07-27 08:02","v":0.4,"type":"flood"},{"t":"2026-07-27 12:00","v":0.0,"type":"slack"},{"t":"2026-07-27 14:16","v":-0.4,"type":"ebb"},{"t":"2026-07-27 18:19","v":0.0,"type":"slack"},{"t":"2026-07-27 20:15","v":0.4,"type":"flood"}]},{"name":"Hempstead Hbr (finish)","sid":"ACT3216","rows":[]}];
+  function renderCurrents() {
+    var dayName = { 23: "Thu", 24: "Fri", 25: "Sat", 26: "Sun", 27: "Mon" };
+    document.getElementById("curHost").innerHTML = CURRENTS.map(function (st) {
+      var rows = st.rows.map(function (r) {
+        var dn = dayName[+r.t.slice(8, 10)] || r.t.slice(5, 10);
+        var cls = r.type === "flood" ? "flood" : r.type === "ebb" ? "ebb" : "";
+        var v = r.type === "slack" ? "slack" : (r.v > 0 ? "+" : "") + r.v.toFixed(1) + " kn " + r.type;
+        return '<tr><td class="num">' + dn + " " + r.t.slice(11) + '</td><td class="r num ' + cls + '">' + v + "</td></tr>";
+      }).join("");
+      var body = st.rows.length
+        ? '<div class="mini-wrap"><table class="mini"><tbody>' + rows + "</tbody></table></div>"
+        : '<p class="src">No NOAA predictions baked for this station — use Matinecock Pt above for the finish approach.</p>';
+      return "<details><summary>" + esc(st.name) + ' <span class="src">(' + esc(st.sid) + ")</span></summary>" + body + "</details>";
+    }).join("");
+  }
+
+  // ---- target-speed calculator ----
+  function tsRecalc() {
+    var out = document.getElementById("tsOut");
+    var name = document.getElementById("tsBoat").value;
+    var b = BOATS.find(function (x) { return x.name === name; });
+    var td = parseFloat(document.getElementById("tsTheirDtf").value);
+    var tspd = parseFloat(document.getElementById("tsTheirSpd").value);
+    var od = parseFloat(document.getElementById("tsOurDtf").value);
+    if (!b || isNaN(td) || isNaN(tspd) || isNaN(od) || tspd <= 0 || td < 0 || od < 0) { out.textContent = ""; return; }
+    var m = marginVs(b);
+    if (m === null) { out.textContent = "Not comparable (ORC)."; return; }
+    var nowSecs = (new Date() - raceDay(0)) / 1000;
+    var deadline = nowSecs + td / tspd * 3600 + m;
+    var earliest = Math.max(nowSecs, startSecs(self.div));
+    var availH = (deadline - earliest) / 3600;
+    if (availH <= 0) {
+      out.innerHTML = "At that pace we cannot beat " + esc(b.name) + " on corrected — the required finish is before our start or already past.";
+      return;
+    }
+    var dd = Math.floor(deadline / 86400);
+    out.innerHTML = "We must average <span class='num'>" + (od / availH).toFixed(1) + " kn</span> to finish by <span class='num'>" +
+      esc(dayLabel(dd)) + " " + fmtClock(deadline - dd * 86400) + "</span> and beat " + esc(b.name) + " on corrected.";
+  }
+  function renderTsBoats() {
+    document.getElementById("tsBoat").innerHTML = BOATS
+      .filter(function (b) { return b.name !== SELF && divOf(b).system === "PHRF"; })
+      .map(function (b) { return '<option value="' + esc(b.name) + '">' + esc(b.name) + "</option>"; }).join("");
+  }
+  ["tsBoat", "tsTheirDtf", "tsTheirSpd", "tsOurDtf"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", tsRecalc);
+    document.getElementById(id).addEventListener("change", tsRecalc);
+  });
+
+  // ---- QR device sync ----
+  document.getElementById("qrBtn").addEventListener("click", function () {
+    var box = document.getElementById("qrBox");
+    var payload = JSON.stringify(buildDiff());
+    var url = location.origin + location.pathname + "#s=" + btoa(unescape(encodeURIComponent(payload)));
+    var urlP = '<p class="src" style="word-break:break-all">' + esc(url) + "</p>";
+    try {
+      var qr = qrcode(0, "M");
+      qr.addData(url);
+      qr.make();
+      box.innerHTML = qr.createImgTag(4, 8) + urlP;
+    } catch (e) {
+      box.innerHTML = '<p class="src">QR too dense to render — open this link on the other device instead:</p>' + urlP;
+    }
+  });
+
+  // ---- start-sequence sounds ----
+  var audioCtx = null, sndArmed = false, prevToStart = null, wakeLock = null;
+  function beep(freq, dur) {
+    if (!audioCtx) return;
+    if (audioCtx.state !== "running" && audioCtx.resume) audioCtx.resume();
+    var o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.frequency.value = freq;
+    o.type = "square";
+    g.gain.value = 0.3;
+    o.connect(g);
+    g.connect(audioCtx.destination);
+    o.start(audioCtx.currentTime);
+    o.stop(audioCtx.currentTime + dur);
+  }
+  document.getElementById("sndBtn").addEventListener("click", function () {
+    sndArmed = !sndArmed;
+    if (sndArmed) {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.resume) audioCtx.resume();
+      beep(880, 0.12);
+    }
+    if (sndArmed && navigator.wakeLock) {
+      navigator.wakeLock.request("screen").then(function (wl) { wakeLock = wl; }).catch(function () { /* unsupported */ });
+    } else if (!sndArmed && wakeLock) {
+      wakeLock.release().catch(function () {});
+      wakeLock = null;
+    }
+    this.textContent = sndArmed ? "🔔 Start sounds armed" : "🔕 Start sounds off";
+  });
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden && sndArmed) {
+      if (audioCtx && audioCtx.resume) audioCtx.resume();
+      if (navigator.wakeLock) navigator.wakeLock.request("screen").then(function (wl) { wakeLock = wl; }).catch(function () {});
+      renderClock();
+    }
+  });
+
+  // ---- YB live tracker ----
+  function haverNm(lat1, lon1, lat2, lon2) {
+    var R = 3440.065, toR = Math.PI / 180;
+    var dLat = (lat2 - lat1) * toR, dLon = (lon2 - lon1) * toR;
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * toR) * Math.cos(lat2 * toR) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    return 2 * R * Math.asin(Math.sqrt(a));
+  }
+  function ybNorm(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9]/g, ""); }
+  function ybFetch() {
+    var status = document.getElementById("ybStatus");
+    var host = document.getElementById("ybHost");
+    var rid = document.getElementById("ybRace").value.trim() || "alir26";
+    status.textContent = "Fetching from YB…";
+    Promise.all([
+      fetch("https://cf.yb.tl/JSON/" + encodeURIComponent(rid) + "/RaceSetup")
+        .then(function (r) { if (!r.ok) throw new Error("RaceSetup HTTP " + r.status); return r.json(); }),
+      fetch("https://cf.yb.tl/JSON/" + encodeURIComponent(rid) + "/LatestPositions")
+        .then(function (r) { if (!r.ok) throw new Error("LatestPositions HTTP " + r.status); return r.json(); })
+    ]).then(function (res) {
+      var setup = res[0], pos = res[1];
+      var byId = {};
+      (pos.teams || []).forEach(function (t) { byId[t.id] = t; });
+      var day0 = raceDay(0).getTime() / 1000;
+      var rows = [];
+      var matched = {};
+      (setup.teams || []).forEach(function (t) {
+        var tn = ybNorm(t.name);
+        if (!tn) return;
+        var boat = BOATS.find(function (b) {
+          return !matched[b.name] && ybNorm(b.name) === tn;
+        }) || BOATS.find(function (b) {
+          if (matched[b.name]) return false;
+          var bn = ybNorm(b.name);
+          return (tn.length >= 4 && bn.indexOf(tn) === 0) || (bn.length >= 4 && tn.indexOf(bn) === 0);
+        });
+        if (!boat || divOf(boat).system !== "PHRF") return;
+        matched[boat.name] = true;
+        var pt = byId[t.id];
+        var ms = (pt && pt.moments ? pt.moments.slice() : []).sort(function (x, y) { return y.at - x.at; });
+        var latest = ms[0];
+        if (!latest && !t.finishedAt) return;
+        var dtfNm = latest && latest.dtf != null ? latest.dtf / 1852 : null;
+        var spd = null;
+        if (ms.length > 1) {
+          var dh = (ms[0].at - ms[1].at) / 3600;
+          if (dh > 0 && dh < 6 && isFinite(ms[0].lat) && isFinite(ms[0].lon) && isFinite(ms[1].lat) && isFinite(ms[1].lon)) {
+            spd = haverNm(ms[1].lat, ms[1].lon, ms[0].lat, ms[0].lon) / dh;
+          }
+        }
+        var projFin = null;
+        if (t.finishedAt) projFin = t.finishedAt - day0;
+        else if (dtfNm != null && spd !== null && spd > 0.3) projFin = (latest.at - day0) + dtfNm / spd * 3600;
+        rows.push({
+          boat: boat, dtfNm: dtfNm, spd: spd, fin: !!t.finishedAt, projFin: projFin,
+          corrected: projFin !== null && projFin > startSecs(boat.div) ? projFin - startSecs(boat.div) - ratingOf(boat) * distOf(boat) : null
+        });
+      });
+      if (!rows.length) {
+        status.textContent = "Feed reached, but no fleet boats matched yet (YB loads the fleet close to the start).";
+        host.innerHTML = "";
+        return;
+      }
+      rows.sort(function (a, b) {
+        if ((a.corrected === null) !== (b.corrected === null)) return a.corrected === null ? 1 : -1;
+        return a.corrected - b.corrected;
+      });
+      var us = null;
+      rows.forEach(function (r) { if (r.boat.name === SELF && r.corrected !== null) us = r; });
+      var body = rows.map(function (r, i) {
+        var proj = "—", corr = "—";
+        if (r.projFin !== null) {
+          var dd = Math.floor(r.projFin / 86400);
+          proj = esc(dayLabel(dd)) + " " + fmtClock(r.projFin - dd * 86400);
+        }
+        if (r.corrected !== null) {
+          if (r.boat.name === SELF) corr = "us";
+          else if (us) {
+            var dv = r.corrected - us.corrected;
+            corr = (dv >= 0 ? "+" : "−") + fmt(dv);
+          } else corr = "corr " + fmt(r.corrected);
+        }
+        return "<tr" + (r.boat.name === SELF ? ' style="background:var(--self-bg)"' : "") + "><td>" + (i + 1) + "</td>" +
+          "<td>" + esc(r.boat.name) + (r.fin ? ' <span class="fin-mark">fin</span>' : "") + "</td>" +
+          '<td class="r num">' + (r.dtfNm != null ? r.dtfNm.toFixed(1) : "—") + "</td>" +
+          '<td class="r num">' + (r.spd !== null ? r.spd.toFixed(1) : "—") + "</td>" +
+          '<td class="r num">' + proj + "</td>" +
+          '<td class="r num">' + corr + "</td></tr>";
+      }).join("");
+      host.innerHTML = '<div class="mini-wrap"><table class="mini"><thead><tr><th>#</th><th>Boat</th>' +
+        '<th class="r">DTF nm</th><th class="r">kn</th><th class="r">Proj. finish</th><th class="r">' + (us ? "Proj. corr. vs us" : "Proj. corr.") + "</th></tr></thead><tbody>" +
+        body + "</tbody></table></div>";
+      status.textContent = "Updated " + new Date().toLocaleTimeString() +
+        " — projections assume each boat holds its recent speed; ranked by projected corrected time.";
+    }).catch(function (e) {
+      status.textContent = "YB fetch failed: " + e.message + " (feed goes fully live on race day; needs signal).";
+    });
+  }
+  document.getElementById("ybBtn").addEventListener("click", ybFetch);
 
   var CK_KEY = "alir2026-checklist-v1";
   var briefing = document.getElementById("briefing");
@@ -888,6 +1278,20 @@
     });
   }
 
+  if (location.hash.indexOf("#s=") === 0) {
+    try {
+      var shared = decodeURIComponent(escape(atob(location.hash.slice(3))));
+      JSON.parse(shared);
+      if (confirm("Import board settings (finish times, edits) from the shared link?")) {
+        try { localStorage.setItem(STORE_KEY, shared); } catch (eSet) { /* apply in-memory anyway */ }
+        state = load(shared);
+      }
+    } catch (e) { /* malformed share payload: ignore */ }
+    history.replaceState(null, "", location.pathname + location.search);
+  }
+
+  renderTsBoats();
+  renderCurrents();
   renderAll(true);
   setInterval(renderClock, 1000);
 })();
