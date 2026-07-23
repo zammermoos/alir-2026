@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="PHRF time-on-distance allowances for Zammermoos vs the 2026 Around Long Island Regatta fleet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x26F5;</text></svg>">
+<title>ALIR 2026 — Zammermoos Time Owed</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f5f6f4;
+    --surface: #ffffff;
+    --ink: #16283a;
+    --ink-soft: #51667a;
+    --line: #d8dee3;
+    --accent: #1d5c8f;
+    --accent-ink: #ffffff;
+    --stbd: #0e7a3d;        /* they owe us — starboard green */
+    --stbd-bg: #e3f2e8;
+    --port: #b3312b;        /* we owe them — port red */
+    --port-bg: #f9e7e5;
+    --na-bg: #eceef0;
+    --self-bg: #fff7dd;
+    --shadow: 0 1px 3px rgba(22,40,58,.12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --bg: #0d1520;
+      --surface: #16202e;
+      --ink: #e8edf2;
+      --ink-soft: #93a3b4;
+      --line: #2a3644;
+      --accent: #5ea3d8;
+      --accent-ink: #0d1520;
+      --stbd: #4fc57e;
+      --stbd-bg: #14311f;
+      --port: #ef7b74;
+      --port-bg: #3c1a17;
+      --na-bg: #1d2836;
+      --self-bg: #2e2a14;
+      --shadow: 0 1px 3px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --bg: #f5f6f4; --surface: #ffffff; --ink: #16283a; --ink-soft: #51667a;
+    --line: #d8dee3; --accent: #1d5c8f; --accent-ink: #ffffff;
+    --stbd: #0e7a3d; --stbd-bg: #e3f2e8; --port: #b3312b; --port-bg: #f9e7e5;
+    --na-bg: #eceef0; --self-bg: #fff7dd;
+    --shadow: 0 1px 3px rgba(22,40,58,.12);
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0d1520; --surface: #16202e; --ink: #e8edf2; --ink-soft: #93a3b4;
+    --line: #2a3644; --accent: #5ea3d8; --accent-ink: #0d1520;
+    --stbd: #4fc57e; --stbd-bg: #14311f; --port: #ef7b74; --port-bg: #3c1a17;
+    --na-bg: #1d2836; --self-bg: #2e2a14;
+    --shadow: 0 1px 3px rgba(0,0,0,.5);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: "Avenir Next", system-ui, -apple-system, sans-serif;
+    font-size: 15px; line-height: 1.45;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 0 12px 80px; }
+  .num { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+
+  header.masthead { padding: 20px 4px 10px; border-bottom: 3px solid var(--ink); margin-bottom: 14px; }
+  .masthead .eyebrow {
+    font-family: "Avenir Next Condensed", "Arial Narrow", sans-serif-condensed, sans-serif;
+    text-transform: uppercase; letter-spacing: .14em; font-size: 12px; color: var(--ink-soft);
+  }
+  .masthead h1 {
+    font-family: "Avenir Next Condensed", "Arial Narrow", sans-serif-condensed, sans-serif;
+    font-weight: 700; font-size: clamp(26px, 6vw, 38px); margin: 2px 0 4px; text-wrap: balance;
+    text-transform: uppercase; letter-spacing: .01em;
+  }
+  .masthead .sub { color: var(--ink-soft); font-size: 14px; }
+  .masthead .sub strong { color: var(--ink); }
+  .masthead .sub input#selfRating {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 14px;
+    width: 64px; padding: 4px 6px; border: 1px solid var(--line); border-radius: 5px;
+    background: var(--bg); color: var(--ink);
+  }
+
+  .clockbar {
+    display: flex; gap: 16px; flex-wrap: wrap; align-items: baseline;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    box-shadow: var(--shadow); padding: 10px 14px; margin-bottom: 14px;
+  }
+  .clockbar .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--ink-soft); display: block; }
+  .clockbar .val { font-size: 20px; font-weight: 600; }
+  .clockbar .tz { flex-basis: 100%; font-size: 11.5px; color: var(--ink-soft); }
+
+  details.controls {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    box-shadow: var(--shadow); margin-bottom: 18px;
+  }
+  details.controls > summary {
+    cursor: pointer; padding: 12px 14px; font-weight: 600; list-style: none;
+    display: flex; justify-content: space-between; align-items: center; min-height: 44px;
+  }
+  details.controls > summary::after { content: "▾"; color: var(--ink-soft); transition: transform .15s; }
+  details.controls[open] > summary::after { transform: rotate(180deg); }
+  details.controls > summary::-webkit-details-marker { display: none; }
+  .controls-body { padding: 0 14px 14px; border-top: 1px solid var(--line); }
+  .ctl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 12px; }
+  .ctl { display: flex; flex-direction: column; gap: 3px; }
+  .ctl label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); }
+  .ctl input {
+    font: inherit; font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    padding: 8px; border: 1px solid var(--line); border-radius: 6px;
+    background: var(--bg); color: var(--ink); width: 100%; min-height: 44px;
+  }
+  .ctl input:focus-visible, button:focus-visible, select:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 1px;
+  }
+  .ctl-note { font-size: 12.5px; color: var(--ink-soft); margin-top: 10px; }
+  button.reset {
+    margin-top: 12px; font: inherit; font-size: 13px; padding: 7px 14px; min-height: 44px;
+    border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); cursor: pointer;
+  }
+
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; margin: 0 2px 12px; font-size: 13px; color: var(--ink-soft); }
+  .legend .chip { display: inline-flex; align-items: center; gap: 6px; }
+  .legend .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; flex: none; }
+
+  section.division { margin-bottom: 20px; }
+  .div-head {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 10px;
+    padding: 6px 4px; border-bottom: 2px solid var(--ink);
+  }
+  .div-head h2 {
+    font-family: "Avenir Next Condensed", "Arial Narrow", sans-serif-condensed, sans-serif;
+    font-size: 17px; margin: 0; text-transform: uppercase; letter-spacing: .04em;
+  }
+  .div-head .meta { font-size: 12.5px; color: var(--ink-soft); white-space: nowrap; }
+
+  table.fleet { width: 100%; border-collapse: collapse; background: var(--surface); box-shadow: var(--shadow); border-radius: 0 0 8px 8px; overflow: hidden; }
+  table.fleet th {
+    text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .09em;
+    color: var(--ink-soft); font-weight: 600; padding: 7px 8px; border-bottom: 1px solid var(--line);
+  }
+  table.fleet td { padding: 9px 8px; border-bottom: 1px solid var(--line); vertical-align: baseline; }
+  table.fleet tr:last-child td { border-bottom: none; }
+  tr.boat { cursor: pointer; }
+  tr.boat:hover td { background: color-mix(in srgb, var(--accent) 7%, transparent); }
+  tr.boat.self { background: var(--self-bg); cursor: default; }
+  td.bname { font-weight: 600; }
+  td.bname .btype { display: block; font-weight: 400; font-size: 12px; color: var(--ink-soft); }
+  button.boat-toggle {
+    font: inherit; font-weight: 600; background: none; border: 0; padding: 0;
+    color: inherit; text-align: left; width: 100%; cursor: pointer;
+  }
+  button.boat-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  td.rating, td.margin { text-align: right; white-space: nowrap; }
+  th.rating, th.margin { text-align: right; }
+  .badge {
+    display: inline-block; padding: 3px 8px; border-radius: 5px; font-weight: 600; font-size: 14px;
+  }
+  .badge.stbd { color: var(--stbd); background: var(--stbd-bg); }
+  .badge.port { color: var(--port); background: var(--port-bg); }
+  .badge.even { color: var(--ink-soft); background: var(--na-bg); }
+  .badge.na { color: var(--ink-soft); background: var(--na-bg); font-weight: 400; font-size: 12px; }
+
+  tr.detail td { background: var(--bg); padding: 14px 12px; }
+  .hh { display: flex; flex-direction: column; gap: 12px; }
+  .hh .verdict { font-size: 15px; }
+  .hh .verdict strong.stbd { color: var(--stbd); }
+  .hh .verdict strong.port { color: var(--port); }
+  .hh .brk { font-size: 12.5px; color: var(--ink-soft); }
+  .hh .calc {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+  }
+  .hh .calc .ctl { min-width: 100px; flex: 1; }
+  .hh .calc .ctl.sec { min-width: 72px; max-width: 90px; }
+  .hh .calc select {
+    font: inherit; padding: 8px; border: 1px solid var(--line); border-radius: 6px;
+    background: var(--bg); color: var(--ink); min-height: 44px; width: 100%;
+  }
+  .hh .target { font-size: 15px; flex-basis: 100%; }
+  .hh .target .num { font-size: 18px; font-weight: 700; }
+  .hh .ratedit { display: flex; gap: 8px; align-items: flex-end; }
+  .hh .ratedit .ctl { max-width: 130px; }
+
+  footer.note { margin-top: 26px; font-size: 12.5px; color: var(--ink-soft); border-top: 1px solid var(--line); padding-top: 12px; }
+  footer.note p { margin: 6px 0; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <div class="eyebrow">49th Around Long Island Regatta · July 23–26, 2026 · Sea Cliff YC</div>
+    <h1>Zammermoos Time-Owed Board</h1>
+    <div class="sub">
+      <strong>Zammermoos</strong> · Club Swan 42 · Uni 4224 ·
+      PHRF <input id="selfRating" type="number" step="0.1" inputmode="decimal" aria-label="Zammermoos PHRF rating, seconds per mile"> s/mi ·
+      Spinnaker Div 9 · start <span class="num" id="selfStart">13:55</span> ·
+      PHRF time-on-distance (per SI)
+    </div>
+  </header>
+
+  <div class="clockbar">
+    <div><span class="lbl">Ship's clock</span><span class="val num" id="nowClock">--:--:--</span></div>
+    <div><span class="lbl">Our elapsed</span><span class="val num" id="nowElapsed">pre-start</span></div>
+    <div><span class="lbl">Course</span><span class="val num" id="nowDist">207 nm</span></div>
+    <div class="tz">Clock and elapsed use this device's timezone — keep the device on race-local (Eastern) time.</div>
+  </div>
+
+  <details class="controls">
+    <summary>Race setup — start times &amp; distances</summary>
+    <div class="controls-body">
+      <div class="ctl-grid">
+        <div class="ctl"><label for="dALI">ALI course (nm)</label><input id="dALI" type="number" step="0.1" inputmode="decimal"></div>
+        <div class="ctl"><label for="dATI">ATI course (nm)</label><input id="dATI" type="number" step="0.1" inputmode="decimal"></div>
+        <div class="ctl"><label for="raceDate">Race date</label><input id="raceDate" type="date"></div>
+      </div>
+      <div class="ctl-grid" id="startGrid"></div>
+      <p class="ctl-note">Starts default to scratch-sheet warning signal + 5 min. If a group is postponed, edit its start here — every margin updates. Distances are scoring distances from the SIs (ALI 207 nm; ATI 230 nm per the scoring section). Only values you change are kept on this device; everything else follows the shipped scratch sheet.</p>
+      <button class="reset" id="resetBtn" type="button">Reset to scratch sheet</button>
+    </div>
+  </details>
+
+  <div class="legend">
+    <span class="chip"><span class="dot" style="background:var(--stbd)"></span>They owe us — they can finish ahead of us by anything <em>less</em> than the margin (clock time) and we still beat them</span>
+    <span class="chip"><span class="dot" style="background:var(--port)"></span>We owe them — we must finish <em>more</em> than the margin ahead of them (clock time)</span>
+  </div>
+
+  <div id="fleet"></div>
+
+  <footer class="note">
+    <p><strong>How margins are figured:</strong> margin = (our start − their start) + (our rating × our distance − their rating × their distance). Because start staggers are folded in, every margin reads directly in <em>finish-line clock time</em>: green means they can cross ahead of us by anything less than that margin and we still win on corrected; red means we must cross more than that margin ahead of them. Finishing separated by exactly the margin is a corrected-time dead heat.</p>
+    <p><strong>ORC Division 0</strong> is scored under ORC APH, a different handicap system — corrected times there are not comparable to PHRF, so no margin is shown. <strong>Nomad</strong> (Div 6) sails the Around-the-Islands course; her margin uses the 230 nm ATI distance and is a paper comparison across different courses.</p>
+    <p>Scored per 2026 ALIR SIs v1.0: PHRF time-on-distance, YRA of LIS distance-race ratings. Edits persist on this device.</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var SELF = "Zammermoos";
+  var STORE_KEY = "alir2026-zammermoos-v1";
+
+  // course: ALI = Around Long Island, ATI = Around the Islands
+  var DIVISIONS = [
+    { id: "d3", name: "Spinnaker Div 3", start: "13:15", course: "ALI", system: "PHRF" },
+    { id: "d4", name: "Double-Handed Div 4", start: "13:15", course: "ALI", system: "PHRF" },
+    { id: "d5", name: "Spinnaker Div 5", start: "13:25", course: "ALI", system: "PHRF" },
+    { id: "d6", name: "Spinnaker Div 6 (ATI)", start: "13:25", course: "ATI", system: "PHRF" },
+    { id: "d7", name: "Spinnaker Div 7", start: "13:35", course: "ALI", system: "PHRF" },
+    { id: "d0", name: "ORC Div 0", start: "13:45", course: "ALI", system: "ORC" },
+    { id: "d8", name: "Spinnaker Div 8", start: "13:45", course: "ALI", system: "PHRF" },
+    { id: "d9", name: "Spinnaker Div 9", start: "13:55", course: "ALI", system: "PHRF" }
+  ];
+
+  var BOATS = [
+    { div: "d3", sail: "USA 3815", name: "ACTAEA", type: "Bermuda 40", rating: 153 },
+    { div: "d3", sail: "USA 1937", name: "Golden-Eye", type: "Rhodes 41", rating: 171 },
+    { div: "d3", sail: "511", name: "Midnight Rider - PMP Strategy", type: "J/30", rating: 141 },
+    { div: "d3", sail: "USA 332", name: "Scarlett", type: "J Boat 30", rating: 147 },
+    { div: "d3", sail: "USA 2222", name: "Tynaje", type: "Ohlson 38", rating: 144 },
+
+    { div: "d4", sail: "USA 25559", name: "Abilyn", type: "J/120", rating: 39 },
+    { div: "d4", sail: "40819", name: "First Rate", type: "Tartan 34-2", rating: 138 },
+    { div: "d4", sail: "USA 075", name: "Halve Maen", type: "Tartan 33", rating: 156 },
+    { div: "d4", sail: "USA 24", name: "Thin Man", type: "J/99", rating: 72 },
+    { div: "d4", sail: "USA 25", name: "Windancer", type: "J/37", rating: 72 },
+
+    { div: "d5", sail: "36", name: "Athena", type: "Catalina 38", rating: 123 },
+    { div: "d5", sail: "46294", name: "Elizabeth", type: "Catalina 42", rating: 111 },
+    { div: "d5", sail: "P39", name: "MARA", type: "Pearson 39-2", rating: 120 },
+    { div: "d5", sail: "42832", name: "MARIE", type: "Tartan 372", rating: 135 },
+    { div: "d5", sail: "18", name: "Mayhem", type: "Frers 30", rating: 132 },
+    { div: "d5", sail: "43895", name: "Peggy-O", type: "Sabre 38", rating: 129 },
+    { div: "d5", sail: "USA 51362", name: "Random", type: "Sabre 362", rating: 126 },
+    { div: "d5", sail: "USA 32685", name: "Ripple", type: "S2 9.1", rating: 135 },
+
+    { div: "d6", sail: "USA 52968", name: "Nomad", type: "Hunter 41DS", rating: 174 },
+
+    { div: "d7", sail: "1543", name: "ARGOS", type: "Dufour 44", rating: 87 },
+    { div: "d7", sail: "USA 61971", name: "Avatar", type: "Beneteau First 42", rating: 87 },
+    { div: "d7", sail: "43392", name: "BETELGEUSE YCC", type: "J/36", rating: 81 },
+    { div: "d7", sail: "USA 169", name: "Little Texas YCC", type: "J/105", rating: 93 },
+    { div: "d7", sail: "USA 444", name: "Phantom", type: "J/105", rating: 87 },
+    { div: "d7", sail: "USA 619", name: "SCAPEGOAT", type: "J/105", rating: 78 },
+    { div: "d7", sail: "USA 93310", name: "The Rover", type: "Swan 44 MkII", rating: 75 },
+    { div: "d7", sail: "408", name: "Valiant YCC", type: "J/105", rating: 75 },
+    { div: "d7", sail: "USA 319", name: "Velocita", type: "J/109", rating: 69 },
+
+    { div: "d0", sail: "USA 44007", name: "Beagle", type: "J/44", rating: 496.7 },
+    { div: "d0", sail: "USA 27", name: "Della Aurora", type: "XR41", rating: 492.1 },
+    { div: "d0", sail: "USA 61124", name: "Habiru YCC", type: "J/121", rating: 488.1 },
+    { div: "d0", sail: "USA108", name: "Imagine", type: "X-382", rating: 558.6 },
+    { div: "d0", sail: "435", name: "Ohana", type: "Arcona 435 MkII", rating: 483.8 },
+    { div: "d0", sail: "52556", name: "Surface Tension", type: "Beneteau First 44.7", rating: 505.4 },
+
+    { div: "d8", sail: "USA 61150", name: "Crocodile", type: "Beneteau First 50", rating: 12 },
+    { div: "d8", sail: "USA 51445", name: "DUET", type: "J/120", rating: 45 },
+    { div: "d8", sail: "51506", name: "Exuberance", type: "X-442", rating: 48 },
+    { div: "d8", sail: "USA 38007", name: "Lioness", type: "Sydney 38", rating: 24 },
+    { div: "d8", sail: "USA 19", name: "VICITAN", type: "Figaro 2", rating: 57 },
+    { div: "d8", sail: "181", name: "WANDERER", type: "Hanse 458", rating: 60 },
+
+    { div: "d9", sail: "GBR 20", name: "Avalanche", type: "Soto 40", rating: -33 },
+    { div: "d9", sail: "CAY61887", name: "Katara56", type: "X-Yacht 56", rating: -18 },
+    { div: "d9", sail: "USA 75050", name: "Max", type: "Pogo 50", rating: -18 },
+    { div: "d9", sail: "USA 52059", name: "Poseidon", type: "Swan 45", rating: -24 },
+    { div: "d9", sail: "Uni 4224", name: "Zammermoos", type: "Club Swan 42", rating: -15 }
+  ];
+
+  var DEFAULTS = { dALI: 207, dATI: 230, raceDate: "2026-07-23", starts: {}, ratings: {} };
+  DIVISIONS.forEach(function (d) { DEFAULTS.starts[d.id] = d.start; });
+  BOATS.forEach(function (b) { DEFAULTS.ratings[b.name] = b.rating; });
+
+  var state = load();
+  var openBoat = null;
+  // per-boat what-if scenario, survives re-renders
+  var scenarios = {};
+  function scenarioFor(name) {
+    return scenarios[name] || (scenarios[name] = { day: "1", time: "12:00", sec: "0" });
+  }
+
+  // Persist ONLY values that differ from the shipped scratch sheet, so a
+  // republished artifact with corrected data is never shadowed by old saves.
+  function diffMap(cur, def) {
+    var out = {};
+    for (var k in cur) if (cur[k] !== def[k]) out[k] = cur[k];
+    return out;
+  }
+  function save() {
+    var out = {
+      starts: diffMap(state.starts, DEFAULTS.starts),
+      ratings: diffMap(state.ratings, DEFAULTS.ratings)
+    };
+    if (state.dALI !== DEFAULTS.dALI) out.dALI = state.dALI;
+    if (state.dATI !== DEFAULTS.dATI) out.dATI = state.dATI;
+    if (state.raceDate !== DEFAULTS.raceDate) out.raceDate = state.raceDate;
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(out)); } catch (e) { /* private mode */ }
+  }
+  function load() {
+    var base = JSON.parse(JSON.stringify(DEFAULTS));
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      if (raw) {
+        var s = JSON.parse(raw);
+        if (s.dALI != null && +s.dALI > 0) base.dALI = +s.dALI;
+        if (s.dATI != null && +s.dATI > 0) base.dATI = +s.dATI;
+        if (typeof s.raceDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.raceDate)) base.raceDate = s.raceDate;
+        if (s.starts) for (var d in s.starts) {
+          if (d in base.starts && /^\d{2}:\d{2}$/.test(s.starts[d])) base.starts[d] = s.starts[d];
+        }
+        if (s.ratings) for (var b in s.ratings) {
+          if (b in base.ratings && typeof s.ratings[b] === "number" && isFinite(s.ratings[b])) base.ratings[b] = s.ratings[b];
+        }
+      }
+    } catch (e) { /* corrupt store: fall back to defaults */ }
+    return base;
+  }
+
+  function divOf(b) { return DIVISIONS.find(function (d) { return d.id === b.div; }); }
+  function distOf(b) { return divOf(b).course === "ATI" ? state.dATI : state.dALI; }
+  function ratingOf(b) { return state.ratings[b.name]; }
+  function startSecs(divId) {
+    var p = (state.starts[divId] || "13:00").split(":");
+    return (+p[0]) * 3600 + (+p[1]) * 60;
+  }
+  var self = BOATS.find(function (b) { return b.name === SELF; });
+
+  // margin > 0: they owe us — they can finish less than M ahead of us (clock) and we still win.
+  // margin < 0: we owe them — we must finish more than |M| ahead of them (clock).
+  // A gap of exactly |M| is a corrected-time dead heat.
+  function marginVs(b) {
+    if (divOf(b).system !== "PHRF") return null;
+    var startDelta = startSecs(self.div) - startSecs(b.div);
+    var allowDelta = ratingOf(self) * distOf(self) - ratingOf(b) * distOf(b);
+    return Math.round(startDelta + allowDelta);
+  }
+
+  function fmt(totalSecs) {
+    var s = Math.abs(Math.round(totalSecs));
+    var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60;
+    var pad = function (n) { return (n < 10 ? "0" : "") + n; };
+    return h > 0 ? h + ":" + pad(m) + ":" + pad(r) : m + ":" + pad(r);
+  }
+  function fmtClock(secsWithinDay) {
+    var s = Math.round(secsWithinDay);
+    var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60;
+    var pad = function (n) { return (n < 10 ? "0" : "") + n; };
+    return pad(h) + ":" + pad(m) + ":" + pad(r);
+  }
+  var WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  function raceDay(offset) {
+    var p = state.raceDate.split("-");
+    return new Date(+p[0], +p[1] - 1, +p[2] + offset);
+  }
+  function dayLabel(offset) {
+    var d = raceDay(offset);
+    return WEEKDAYS[d.getDay()] + " " + d.getDate();
+  }
+  function esc(str) {
+    return String(str).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
+  function slug(name) { return name.replace(/[^a-zA-Z0-9]+/g, "-").toLowerCase(); }
+  function cssEsc(s) { return window.CSS && CSS.escape ? CSS.escape(s) : s.replace(/"/g, '\\"'); }
+
+  function badge(m) {
+    if (m === null) return '<span class="badge na">ORC — n/c</span>';
+    if (m === 0) return '<span class="badge even">even</span>';
+    if (m > 0) return '<span class="badge stbd num">+' + fmt(m) + "</span>";
+    return '<span class="badge port num">−' + fmt(m) + "</span>";
+  }
+
+  function renderControls(rebuild) {
+    var syncField = function (id, val) {
+      var el = document.getElementById(id);
+      if (el && el !== document.activeElement) el.value = val;
+    };
+    syncField("dALI", state.dALI);
+    syncField("dATI", state.dATI);
+    syncField("raceDate", state.raceDate);
+    var grid = document.getElementById("startGrid");
+    if (rebuild || !grid.children.length) {
+      grid.innerHTML = DIVISIONS.map(function (d) {
+        return '<div class="ctl"><label for="st-' + d.id + '">' + esc(d.name) + ' start</label>' +
+          '<input id="st-' + d.id + '" type="time" value="' + esc(state.starts[d.id]) + '" data-div="' + d.id + '"></div>';
+      }).join("");
+    } else {
+      DIVISIONS.forEach(function (d) { syncField("st-" + d.id, state.starts[d.id]); });
+    }
+  }
+
+  function renderSelfMeta() {
+    document.getElementById("nowDist").textContent = state.dALI + " nm";
+    document.getElementById("selfStart").textContent = state.starts[self.div];
+    var sr = document.getElementById("selfRating");
+    if (sr !== document.activeElement) sr.value = ratingOf(self);
+  }
+
+  function renderFleet() {
+    var host = document.getElementById("fleet");
+    host.innerHTML = DIVISIONS.map(function (d) {
+      var boats = BOATS.filter(function (b) { return b.div === d.id; });
+      var rows = boats.map(function (b) {
+        var isSelf = b.name === SELF;
+        var m = isSelf ? 0 : marginVs(b);
+        var nameCell = isSelf
+          ? esc(b.name)
+          : '<button type="button" class="boat-toggle" aria-expanded="' + (openBoat === b.name) +
+            '" aria-controls="det-' + slug(b.name) + '">' + esc(b.name) + "</button>";
+        var cells =
+          '<td class="bname">' + nameCell + '<span class="btype">' + esc(b.sail) + " · " + esc(b.type) + "</span></td>" +
+          '<td class="rating num">' + ratingOf(b) + "</td>" +
+          '<td class="margin">' + (isSelf ? '<span class="badge even">us</span>' : badge(m)) + "</td>";
+        var main = '<tr class="boat' + (isSelf ? " self" : "") + '" data-boat="' + esc(b.name) + '">' + cells + "</tr>";
+        var det = (!isSelf && openBoat === b.name) ? detailRow(b) : "";
+        return main + det;
+      }).join("");
+      return '<section class="division">' +
+        '<div class="div-head"><h2>' + esc(d.name) + '</h2><div class="meta num">start ' + esc(state.starts[d.id]) +
+        " · " + (d.course === "ATI" ? state.dATI + " nm ATI" : state.dALI + " nm ALI") +
+        " · " + (d.system === "ORC" ? "ORC APH" : "PHRF ToD") + "</div></div>" +
+        '<table class="fleet"><thead><tr><th>Boat</th><th class="rating">' + (d.system === "ORC" ? "APH s/mi" : "PHRF s/mi") +
+        '</th><th class="margin">Margin vs us</th></tr></thead><tbody>' + rows + "</tbody></table></section>";
+    }).join("");
+    if (openBoat) wireDetail();
+  }
+
+  function toggleBoat(name) {
+    openBoat = openBoat === name ? null : name;
+    renderFleet();
+    var btn = document.querySelector('#fleet tr.boat[data-boat="' + cssEsc(name) + '"] .boat-toggle');
+    if (btn) btn.focus();
+  }
+
+  function detailRow(b) {
+    var m = marginVs(b);
+    var d = divOf(b);
+    var sc = scenarioFor(b.name);
+    var startDelta = startSecs(self.div) - startSecs(b.div);
+    var verdict, brk;
+    if (m === null) {
+      verdict = "<strong>" + esc(b.name) + "</strong> is scored under ORC APH — corrected times are not comparable with our PHRF score. Shown for reference only.";
+      brk = "APH " + ratingOf(b) + " s/mi · starts " + esc(state.starts[b.div]);
+    } else if (m === 0) {
+      verdict = "<strong>" + esc(b.name) + "</strong> — dead even on handicap: whoever crosses the line first wins on corrected. A simultaneous finish is a corrected-time tie.";
+    } else if (m > 0) {
+      verdict = '<strong class="stbd">' + esc(b.name) + " owes us " + fmt(m) + "</strong> — they can cross the line ahead of us by anything less than " +
+        fmt(m) + " (clock time) and we still beat them on corrected. Exactly " + fmt(m) + " ahead is a dead heat.";
+    } else {
+      verdict = '<strong class="port">We owe ' + esc(b.name) + " " + fmt(m) + "</strong> — we must cross the line more than " +
+        fmt(m) + " ahead of them (clock time) to beat them on corrected. Exactly " + fmt(m) + " ahead is a dead heat.";
+    }
+    if (m !== null) {
+      var allowDelta = ratingOf(self) * distOf(self) - ratingOf(b) * distOf(b);
+      brk = "Rating allowance " + (allowDelta >= 0 ? "+" : "−") + fmt(allowDelta) +
+        " (" + ratingOf(self) + " vs " + ratingOf(b) + " s/mi over " + distOf(self) +
+        (d.course === "ATI" ? "/" + distOf(b) : "") + " nm)" +
+        (startDelta !== 0 ? " · start stagger " + (startDelta >= 0 ? "+" : "−") + fmt(startDelta) +
+          " (they start " + (startDelta > 0 ? "before" : "after") + " us)" : " · same start") +
+        (d.course === "ATI" ? " · different course — paper comparison only" : "");
+    }
+    var dayOpts = [0, 1, 2, 3, 4].map(function (i) {
+      return '<option value="' + i + '"' + (String(i) === sc.day ? " selected" : "") + ">" + esc(dayLabel(i)) + "</option>";
+    }).join("");
+    var calc = m === null ? "" :
+      '<div class="calc">' +
+        '<div class="ctl"><label for="hh-day">Their finish day</label><select id="hh-day">' + dayOpts + "</select></div>" +
+        '<div class="ctl"><label for="hh-time">Their finish (hh:mm)</label><input id="hh-time" type="time" value="' + esc(sc.time) + '"></div>' +
+        '<div class="ctl sec"><label for="hh-sec">+ sec</label><input id="hh-sec" type="number" min="0" max="59" step="1" inputmode="numeric" value="' + esc(sc.sec) + '"></div>' +
+        '<div class="target" id="hh-out"></div>' +
+      "</div>";
+    var ratedit =
+      '<div class="ratedit"><div class="ctl"><label for="hh-rate">' + (d.system === "ORC" ? "APH" : "Rating") +
+      ' (edit if scratch changes)</label><input id="hh-rate" type="number" step="0.1" inputmode="decimal" value="' + ratingOf(b) + '"></div></div>';
+    return '<tr class="detail" id="det-' + slug(b.name) + '"><td colspan="3"><div class="hh">' +
+      '<div class="verdict">' + verdict + "</div>" +
+      '<div class="brk num">' + brk + "</div>" + calc + ratedit +
+      "</div></td></tr>";
+  }
+
+  function wireDetail() {
+    var b = BOATS.find(function (x) { return x.name === openBoat; });
+    if (!b) return;
+    var sc = scenarioFor(b.name);
+    var day = document.getElementById("hh-day");
+    var time = document.getElementById("hh-time");
+    var sec = document.getElementById("hh-sec");
+    var out = document.getElementById("hh-out");
+    var rate = document.getElementById("hh-rate");
+    function recalc() {
+      if (!day || !time || !out) return;
+      var m = marginVs(b);
+      if (m === null || !time.value) { out.textContent = ""; return; }
+      var p = time.value.split(":");
+      var secs = Math.min(59, Math.max(0, parseInt(sec && sec.value, 10) || 0));
+      var theirFinish = (+day.value) * 86400 + (+p[0]) * 3600 + (+p[1]) * 60 + secs;
+      if (theirFinish < startSecs(b.div)) {
+        out.innerHTML = "That finish is before their own " + esc(state.starts[b.div]) + " start — check the day and time entered.";
+        return;
+      }
+      var ourDeadline = theirFinish + m;
+      if (ourDeadline < startSecs(self.div)) {
+        out.innerHTML = "If they finish then, we cannot beat them on corrected — the required finish would be before our own start.";
+        return;
+      }
+      var dayIdx = Math.floor(ourDeadline / 86400);
+      out.innerHTML = "If they finish then, we must finish before <span class='num'>" +
+        esc(dayLabel(dayIdx)) + " " + fmtClock(ourDeadline - dayIdx * 86400) +
+        "</span> to beat them on corrected — finishing exactly then is a dead heat.";
+    }
+    if (day) day.addEventListener("change", function () { sc.day = day.value; recalc(); });
+    if (time) time.addEventListener("input", function () { sc.time = time.value; recalc(); });
+    if (sec) sec.addEventListener("input", function () { sc.sec = sec.value; recalc(); });
+    if (rate) rate.addEventListener("change", function () {
+      var v = parseFloat(rate.value);
+      if (!isNaN(v)) {
+        state.ratings[b.name] = v;
+        save();
+        renderFleet();
+        renderSelfMeta();
+        var again = document.getElementById("hh-rate");
+        if (again) again.focus();
+      } else {
+        rate.value = ratingOf(b);
+      }
+    });
+    recalc();
+  }
+
+  function renderClock() {
+    var now = new Date();
+    var pad = function (n) { return (n < 10 ? "0" : "") + n; };
+    document.getElementById("nowClock").textContent =
+      pad(now.getHours()) + ":" + pad(now.getMinutes()) + ":" + pad(now.getSeconds());
+    var startDT = raceDay(0);
+    startDT.setSeconds(startSecs(self.div));
+    var el = (now - startDT) / 1000;
+    document.getElementById("nowElapsed").textContent = el < 0 ? "pre-start" : fmt(el);
+  }
+
+  function renderAll(rebuildControls) {
+    renderSelfMeta();
+    renderControls(rebuildControls);
+    renderFleet();
+    renderClock();
+  }
+
+  // --- wiring (attached once; renders never rebuild these hosts' listeners) ---
+
+  document.getElementById("fleet").addEventListener("click", function (e) {
+    var tr = e.target.closest("tr.boat");
+    if (tr && !tr.classList.contains("self") && !e.target.closest("tr.detail")) {
+      toggleBoat(tr.dataset.boat);
+    }
+  });
+
+  document.getElementById("startGrid").addEventListener("change", function (e) {
+    var id = e.target && e.target.dataset ? e.target.dataset.div : null;
+    if (id && e.target.value) {
+      state.starts[id] = e.target.value;
+      save();
+      renderFleet();
+      renderSelfMeta();
+      renderClock();
+    }
+  });
+
+  document.getElementById("dALI").addEventListener("change", function (e) {
+    var v = parseFloat(e.target.value);
+    if (!isNaN(v) && v > 0) { state.dALI = v; save(); renderFleet(); renderSelfMeta(); }
+    else { e.target.value = state.dALI; }
+  });
+  document.getElementById("dATI").addEventListener("change", function (e) {
+    var v = parseFloat(e.target.value);
+    if (!isNaN(v) && v > 0) { state.dATI = v; save(); renderFleet(); renderSelfMeta(); }
+    else { e.target.value = state.dATI; }
+  });
+  document.getElementById("raceDate").addEventListener("change", function (e) {
+    if (e.target.value) {
+      state.raceDate = e.target.value;
+      save();
+      renderFleet();   // open detail's day labels depend on the date
+      renderClock();
+    }
+  });
+  document.getElementById("selfRating").addEventListener("change", function (e) {
+    var v = parseFloat(e.target.value);
+    if (!isNaN(v)) { state.ratings[SELF] = v; save(); renderFleet(); renderSelfMeta(); }
+    else { e.target.value = ratingOf(self); }
+  });
+  document.getElementById("resetBtn").addEventListener("click", function () {
+    try { localStorage.removeItem(STORE_KEY); } catch (e) { /* ignore */ }
+    state = JSON.parse(JSON.stringify(DEFAULTS));
+    renderAll(true);
+  });
+
+  renderAll(true);
+  setInterval(renderClock, 1000);
+})();
+</script>
+</body>
+</html>
