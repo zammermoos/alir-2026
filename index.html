@@ -97,6 +97,13 @@
   .clockbar .val { font-size: 20px; font-weight: 600; }
   .clockbar .tz { flex-basis: 100%; font-size: 11.5px; color: var(--ink-soft); }
 
+  nav.doclinks {
+    display: flex; flex-wrap: wrap; gap: 6px 16px;
+    margin: 0 2px 14px; font-size: 13.5px;
+  }
+  nav.doclinks a { color: var(--accent); text-decoration: none; font-weight: 600; padding: 4px 0; }
+  nav.doclinks a:hover, nav.doclinks a:focus-visible { text-decoration: underline; }
+
   details.controls {
     background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
     box-shadow: var(--shadow); margin-bottom: 18px;
@@ -213,6 +220,13 @@
     <div><span class="lbl">Course</span><span class="val num" id="nowDist">207 nm</span></div>
     <div class="tz">Clock and elapsed use this device's timezone — keep the device on race-local (Eastern) time.</div>
   </div>
+
+  <nav class="doclinks" aria-label="Race documents">
+    <a href="https://ys-uploads-prod2.s3.us-west-1.amazonaws.com/event_documents/50645/5668cd00-6349-4784-9f17-dbb69f80148c.pdf" target="_blank" rel="noopener">Sailing Instructions (PDF)</a>
+    <a href="https://ys-uploads-prod2.s3.us-west-1.amazonaws.com/event_documents/50645/14cabaa0-a25c-44e0-89e4-3ea9f1e6999d.pdf" target="_blank" rel="noopener">Notice of Race (PDF)</a>
+    <a href="https://ys-uploads-prod2.s3.us-west-1.amazonaws.com/event_documents/50645/25b1ea18-8f1b-46de-aa66-0066a674911e.pdf" target="_blank" rel="noopener">NOR Amendment 1 (PDF)</a>
+    <a href="https://yachtscoring.com/emenu/50645" target="_blank" rel="noopener">YachtScoring event page</a>
+  </nav>
 
   <details class="controls">
     <summary>Race setup — start times &amp; distances</summary>
